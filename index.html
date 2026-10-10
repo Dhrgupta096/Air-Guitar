@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>🎸 Real Guitar Simulator — Interactive Chords & Fretboard</title>
+
+  <!-- MediaPipe Hands CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js" crossorigin="anonymous"></script>
+  <script>
+    if (typeof Hands === "undefined") {
+      document.write('<script src="https://unpkg.com/@mediapipe/hands@0.4.1675469240/hands.js"><\/script>');
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg: #0b0d14;
+      --card-bg: rgba(16, 20, 32, 0.94);
+      --border: rgba(255, 255, 255, 0.12);
+      --gold: #e5b95c;
+      --fret-wood: #261c16;
+      --fret-wood-dark: #1a120e;
+      --finger-1: #38bdf8;
+      --finger-2: #4ade80;
+      --finger-3: #fbbf24;
+      --finger-4: #c084fc;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      margin-top: 3px;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      max-width: 1080px;
+      width: 100%;
+    }
+
+    .stage-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 640px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #000000;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+    }
+
+    video#webcam {
+      display: none;
+    }
+
+    canvas#trackingCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+
+    /* Live HUD */
+    .hud-overlay {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .chord-card {
+      background: rgba(12, 16, 26, 0.92);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      max-width: 440px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .chord-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .chord-name-huge {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .chord-full-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .lyrics-tag {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .chord-voicing-pills {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .voicing-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-family: monospace;
+      color: #e2e8f0;
+    }
+
+    .metrics-hud {
+      display: flex;
+      gap: 10px;
+    }
+
+    .metric-card {
+      background: rgba(12, 16, 26, 0.92);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      border-radius: 12px;
+      padding: 8px 14px;
+      text-align: right;
+    }
+
+    .metric-title {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+
+    .dot.live {
+      background: #22c55e;
+    }
+
+    /* BACKGROUND SONG & VOCALS BAR */
+    .bg-song-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bg-song-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .song-title-label {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .song-dropdown {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.86rem;
+      outline: none;
+    }
+
+    .song-dropdown option {
+      background: #101420;
+      color: #ffffff;
+    }
+
+    .audio-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #ffffff;
+      padding: 7px 16px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .audio-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .audio-btn.primary {
+      background: var(--gold);
+      color: #0c0e14;
+      border-color: var(--gold);
+    }
+
+    .audio-btn.primary:hover {
+      background: #f0ca72;
+    }
+
+    .volume-slider-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .volume-slider-group input[type="range"] {
+      width: 90px;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    /* REAL GUITAR FRETBOARD INTERACTIVE PANEL */
+    .fretboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .fretboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fretboard-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fret-finger-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .finger-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #000000;
+    }
+
+    .fretboard-canvas-container {
+      position: relative;
+      width: 100%;
+      height: 145px;
+      background: linear-gradient(180deg, var(--fret-wood), var(--fret-wood-dark));
+      border-radius: 12px;
+      border: 2px solid #3d2b20;
+      box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+
+    canvas#fretboardCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .chord-instruction {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .finger-steps {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .finger-step-pill {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .panel-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .panel-label {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .chord-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text);
+      min-width: 52px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .chord-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .chord-btn.active {
+      background: var(--gold);
+      color: #0c0e14;
+      border-color: var(--gold);
+      box-shadow: 0 4px 14px rgba(229, 185, 92, 0.35);
+    }
+
+    /* Toggle Switch */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      transition: background 0.3s;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle-checkbox {
+      display: none;
+    }
+
+    .toggle-checkbox:checked + .toggle-switch {
+      background: var(--gold);
+    }
+
+    .toggle-checkbox:checked + .toggle-switch::after {
+      transform: translateX(20px);
+    }
+
+    /* Start Overlay */
+    .start-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 12, 18, 0.94);
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      padding: 30px;
+      text-align: center;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .start-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .start-overlay h2 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .start-overlay p {
+      max-width: 520px;
+      color: var(--text-muted);
+      font-size: 0.96rem;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .primary-btn {
+      background: var(--gold);
+      color: #0c0e14;
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 13px 32px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(229, 185, 92, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(229, 185, 92, 0.45);
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background 0.2s ease;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .guide-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+
+    .guide-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .guide-card strong {
+      color: #fff;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎸 REAL GUITAR SIMULATOR</h1>
+    <p class="subtitle">Act on guitar with natural air strumming while real acoustic guitar & vocal backing tracks play in sync.</p>
+  </header>
+
+  <div class="main-container">
+    <div class="stage-wrapper">
+      <video id="webcam" playsinline autoplay muted></video>
+      <canvas id="trackingCanvas"></canvas>
+
+      <!-- Live Heads-Up Display -->
+      <div class="hud-overlay">
+        <div class="chord-card">
+          <div class="chord-title-row">
+            <span class="chord-name-huge" id="hudChord">Em</span>
+            <span class="chord-full-name" id="hudFullName">E Minor</span>
+          </div>
+          <div class="lyrics-tag" id="hudLyrics">"Pani da rang vekh ke... akhiyaan 'ch hanju rul de..."</div>
+          <div class="chord-voicing-pills" id="hudVoicingPills"></div>
+        </div>
+
+        <div class="metrics-hud">
+          <div class="metric-card">
+            <div class="metric-title">Acting Strum</div>
+            <div class="metric-value" id="hudActingStatus" style="color: var(--gold);">Strum to Jam!</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Total Strums</div>
+            <div class="metric-value" id="hudTotalStrums">0</div>
+          </div>
+          <div class="metric-card" style="display: flex; align-items: center;">
+            <div class="status-badge">
+              <span class="dot" id="trackingDot"></span>
+              <span id="trackingText">Standby</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Overlay -->
+      <div class="start-overlay" id="startOverlay">
+        <h2>Acoustic Guitar Jam Ready</h2>
+        <p>
+          Turn on your camera! Strum in the air with your hands to play authentic acoustic guitar chords along with real vocal backing tracks.
+        </p>
+        <button class="primary-btn" id="startBtn" onclick="initApp()">🎸 Start Camera & Jam</button>
+        <button class="secondary-btn" onclick="startMouseDemo()">🖱️ Test with Mouse / Touch Demo</button>
+        <div id="initError" style="color: #ef4444; font-size: 0.88rem; margin-top: 12px; display: none;"></div>
+      </div>
+    </div>
+
+    <!-- BACKGROUND VOCALS & SONG CONTROLS -->
+    <div class="bg-song-card">
+      <div class="bg-song-row">
+        <div class="panel-group">
+          <span class="song-title-label">
+            <span>🎤 Song & Vocal Track:</span>
+            <select id="bgSongSelect" class="song-dropdown" onchange="changeTrack(this.value)">
+              <option value="pani_da_rang">🌟 Pani Da Rang (Acoustic Vocal + Guitar)</option>
+              <option value="mitti_di_khushboo">🌾 Mitti Di Khushboo (Acoustic Vocal + Guitar)</option>
+              <option value="nazm_nazm">✨ Nazm Nazm (Acoustic Vocal + Guitar)</option>
+              <option value="saadi_galli">🎬 Saadi Galli Aaja (Acoustic Vocal + Guitar)</option>
+              <option value="acoustic_ballad">🥁 Acoustic Jam Drum Beat (85 BPM)</option>
+            </select>
+          </span>
+
+          <button class="audio-btn primary" id="btnPlayBg" onclick="togglePlayBgSong()">▶️ Play Song</button>
+          
+          <label class="audio-btn" style="cursor: pointer;">
+            📁 Load Any MP3 File
+            <input type="file" id="userAudioFile" accept="audio/*" style="display: none;" onchange="loadUserAudioFile(event)">
+          </label>
+        </div>
+
+        <div class="panel-group">
+          <label class="toggle-wrapper" title="When enabled, the song plays smoothly when you are strumming/acting in the air, and pauses if you stop!">
+            <input type="checkbox" id="rockstarModeToggle" class="toggle-checkbox" checked onchange="toggleRockstarMode(this.checked)">
+            <div class="toggle-switch"></div>
+            <span style="font-size: 0.86rem; font-weight: 700; color: var(--gold);">Air Guitarist Mode (Strum to Play)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="bg-song-row" style="font-size: 0.84rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px;">
+        <div class="volume-slider-group">
+          <span>Song / Vocal Vol:</span>
+          <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="setBgVolume(this.value)">
+        </div>
+
+        <div class="volume-slider-group">
+          <span>Your Hand Strum Vol:</span>
+          <input type="range" id="strumVolumeSlider" min="0" max="1.5" step="0.05" value="1.0" oninput="setStrumVolume(this.value)">
+        </div>
+
+        <span style="color: var(--text-muted); font-size: 0.82rem;" id="bgTrackStatus">Ready · Strum in the air to drive the music!</span>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE REAL GUITAR FRETBOARD -->
+    <div class="fretboard-card">
+      <div class="fretboard-header">
+        <div class="fretboard-title">
+          <span>🎸 Interactive Fretboard — Exact Finger Pressing Points</span>
+        </div>
+        <div class="fret-finger-legend">
+          <div class="legend-item"><span class="finger-dot" style="background: var(--finger-1);">1</span> Index</div>
+          <div class="legend-item"><span class="finger-dot" style="background: var(--finger-2);">2</span> Middle</div>
+          <div class="legend-item"><span class="finger-dot" style="background: var(--finger-3);">3</span> Ring</div>
+          <div class="legend-item"><span class="finger-dot" style="background: var(--finger-4);">4</span> Pinky</div>
+          <div class="legend-item"><span style="color: #22c55e; font-weight: 800;">O</span> Open</div>
+          <div class="legend-item"><span style="color: #ef4444; font-weight: 800;">×</span> Mute</div>
+        </div>
+      </div>
+
+      <div class="fretboard-canvas-container">
+        <canvas id="fretboardCanvas"></canvas>
+      </div>
+
+      <div class="chord-instruction">
+        <span style="font-weight: 700; color: #ffffff;">How to Press this Chord:</span>
+        <div class="finger-steps" id="hudFingerSteps"></div>
+      </div>
+    </div>
+
+    <!-- CHORD SELECTOR PANEL -->
+    <div class="controls-panel">
+      <div class="control-row">
+        <div class="panel-group">
+          <span class="panel-label">Select Chord:</span>
+          <button class="chord-btn" onclick="selectChord('C')">C</button>
+          <button class="chord-btn" onclick="selectChord('G')">G</button>
+          <button class="chord-btn" onclick="selectChord('D')">D</button>
+          <button class="chord-btn active" onclick="selectChord('Em')">Em</button>
+          <button class="chord-btn" onclick="selectChord('Am')">Am</button>
+          <button class="chord-btn" onclick="selectChord('E')">E</button>
+          <button class="chord-btn" onclick="selectChord('A')">A</button>
+          <button class="chord-btn" onclick="selectChord('F')">F</button>
+          <button class="chord-btn" onclick="selectChord('Dm')">Dm</button>
+        </div>
+
+        <div class="panel-group">
+          <span class="panel-label">Keys:</span>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">1–9 switch chords, Space strums</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Guide -->
+    <div class="guide-cards">
+      <div class="guide-card">
+        <strong>1. Air Guitarist Mode (Acting on Guitar)</strong>
+        Act like you are playing the guitar! When you strum down or up in the air, the vocals and acoustic guitar play along in sync with your hand movement.
+      </div>
+      <div class="guide-card">
+        <strong>2. Real Vocals + Real Strums</strong>
+        The background audio plays authentic vocal tracks, while your hands strum real acoustic steel strings layered on top in perfect harmony.
+      </div>
+      <div class="guide-card">
+        <strong>3. Exact Finger Placement</strong>
+        The interactive fretboard shows the exact strings and frets to press for each chord (`Em`, `D`, `C`, `G`, etc.) as the song progresses!
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       GLOBAL VARIABLES & STATE (Hoisted safely to prevent TDZ errors)
+       ========================================================================== */
+    var handsDetector = null;
+    var webcamElement = null;
+    var canvas = null;
+    var ctx = null;
+    var fCanvas = null;
+    var fCtx = null;
+    var startOverlay = null;
+    var trackingDot = null;
+    var trackingText = null;
+
+    var hudChord = null;
+    var hudFullName = null;
+    var hudVoicingPills = null;
+    var hudActingStatus = null;
+    var hudTotalStrums = null;
+    var hudFingerSteps = null;
+    var hudLyrics = null;
+    var bgTrackStatus = null;
+    var btnPlayBg = null;
+    var bgVolumeSlider = null;
+
+    var isWebcamRunning = false;
+    var isMouseDemo = false;
+    var isProcessing = false;
+    var prevStrumY = null;
+    var activeChordKey = 'Em';
+    var totalStrums = 0;
+    var lastStrumTime = 0;
+    var rockstarAirMode = true;
+    var rockstarPauseTimer = null;
+    var songProgressionIndex = 0;
+    var guitarAudio = null;
+    var songPlayer = null;
+
+    function initDomReferences() {
+      webcamElement = document.getElementById('webcam');
+      canvas = document.getElementById('trackingCanvas');
+      if (canvas) ctx = canvas.getContext('2d');
+      fCanvas = document.getElementById('fretboardCanvas');
+      if (fCanvas) fCtx = fCanvas.getContext('2d');
+
+      startOverlay = document.getElementById('startOverlay');
+      trackingDot = document.getElementById('trackingDot');
+      trackingText = document.getElementById('trackingText');
+      hudChord = document.getElementById('hudChord');
+      hudFullName = document.getElementById('hudFullName');
+      hudVoicingPills = document.getElementById('hudVoicingPills');
+      hudActingStatus = document.getElementById('hudActingStatus');
+      hudTotalStrums = document.getElementById('hudTotalStrums');
+      hudFingerSteps = document.getElementById('hudFingerSteps');
+      hudLyrics = document.getElementById('hudLyrics');
+      bgTrackStatus = document.getElementById('bgTrackStatus');
+      btnPlayBg = document.getElementById('btnPlayBg');
+      bgVolumeSlider = document.getElementById('bgVolumeSlider');
+    }
+
+    // Initialize immediate DOM references as HTML is already parsed
+    initDomReferences();
+
+    /* ==========================================================================
+       1. REAL GUITAR AUDIO ENGINE & AUDIO SAMPLES
+       ========================================================================== */
+    class RealGuitarAudio {
+      constructor() {
+        this.ctx = null;
+        this.sampleBuffers = {};
+        this.masterGain = null;
+        this.strumGain = null;
+        this.bgGain = null;
+        this.compressor = null;
+        this.isLoaded = false;
+
+        this.sampleList = [
+          'E2', 'F2', 'Gb2', 'G2', 'Ab2', 'A2', 'Bb2', 'B2',
+          'C3', 'Db3', 'D3', 'Eb3', 'E3', 'F3', 'Gb3', 'G3', 'Ab3', 'A3', 'Bb3', 'B3',
+          'C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4',
+          'E5'
+        ];
+      }
+
+      async init() {
+        if (this.ctx) return;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContext();
+
+        this.compressor = this.ctx.createDynamicsCompressor();
+        this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
+        this.compressor.knee.setValueAtTime(24, this.ctx.currentTime);
+        this.compressor.ratio.setValueAtTime(8, this.ctx.currentTime);
+
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(0.95, this.ctx.currentTime);
+
+        this.strumGain = this.ctx.createGain();
+        this.strumGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
+
+        this.bgGain = this.ctx.createGain();
+        this.bgGain.gain.setValueAtTime(0.8, this.ctx.currentTime);
+
+        this.strumGain.connect(this.compressor);
+        this.bgGain.connect(this.compressor);
+        this.compressor.connect(this.masterGain);
+        this.masterGain.connect(this.ctx.destination);
+
+        this.loadSamples();
+      }
+
+      async loadSamples() {
+        for (const note of this.sampleList) {
+          try {
+            const resp = await fetch(`samples/${note}.mp3`);
+            if (resp.ok) {
+              const arrayBuf = await resp.arrayBuffer();
+              const audioBuf = await this.ctx.decodeAudioData(arrayBuf);
+              this.sampleBuffers[note] = audioBuf;
+            }
+          } catch (e) {
+            console.warn(`Could not load ${note}`, e);
+          }
+        }
+        this.isLoaded = true;
+      }
+
+      playNote(noteName, velocity = 0.85, delaySec = 0) {
+        if (!this.ctx) this.init();
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+
+        if (noteName === 'mute' || !noteName) return;
+
+        const buffer = this.sampleBuffers[noteName];
+        if (buffer) {
+          const source = this.ctx.createBufferSource();
+          source.buffer = buffer;
+
+          const gainNode = this.ctx.createGain();
+          const vol = Math.min(1.2, Math.max(0.35, velocity));
+          const startTime = this.ctx.currentTime + delaySec;
+
+          gainNode.gain.setValueAtTime(vol, startTime);
+          source.connect(gainNode);
+          gainNode.connect(this.strumGain);
+          source.start(startTime);
+        }
+      }
+
+      strumChord(notes, velocity = 0.9, downstroke = true) {
+        if (!this.ctx) this.init();
+        const activeNotes = downstroke ? [...notes] : [...notes].reverse();
+        const pickDelay = 0.015;
+
+        let playedIndex = 0;
+        activeNotes.forEach((note) => {
+          if (note && note !== 'mute') {
+            this.playNote(note, velocity, playedIndex * pickDelay);
+            playedIndex++;
+          }
+        });
+      }
+    }
+
+    /* ==========================================================================
+       2. VOCAL & SONG AUDIO ENGINE
+       ========================================================================== */
+    class SongPlayer {
+      constructor(audioEngine) {
+        this.engine = audioEngine;
+        this.audioEl = new Audio();
+        this.audioEl.loop = true;
+        this.isPlaying = false;
+        this.currentTrackKey = 'pani_da_rang';
+
+        this.trackFiles = {
+          'pani_da_rang': {
+            file: 'samples/pani_da_rang.m4a',
+            title: 'Pani Da Rang',
+            lyrics: '"Pani da rang vekh ke... akhiyaan \'ch hanju rul de..."',
+            defaultChord: 'Em',
+            progression: ['Em', 'D', 'C', 'D']
+          },
+          'mitti_di_khushboo': {
+            file: 'samples/mitti_di_khushboo.m4a',
+            title: 'Mitti Di Khushboo',
+            lyrics: '"Jadon ambiyaan nu aave baur... pind chete aunda ae..."',
+            defaultChord: 'G',
+            progression: ['G', 'Em', 'C', 'D']
+          },
+          'nazm_nazm': {
+            file: 'samples/nazm_nazm.m4a',
+            title: 'Nazm Nazm',
+            lyrics: '"Tu nazm nazm sa mere... hothon pe thehar ja..."',
+            defaultChord: 'C',
+            progression: ['C', 'G', 'Am', 'F']
+          },
+          'saadi_galli': {
+            file: 'samples/saadi_galli.m4a',
+            title: 'Saadi Galli Aaja',
+            lyrics: '"Saddi gali aaja saanu kahan na sataa... chhad ke na jaayi..."',
+            defaultChord: 'Em',
+            progression: ['Em', 'C', 'G', 'D']
+          }
+        };
+
+        this.currentTrackKey = 'pani_da_rang';
+        this.audioEl.src = this.trackFiles['pani_da_rang'].file;
+      }
+
+      setTrack(key) {
+        this.currentTrackKey = key;
+        const track = this.trackFiles[key];
+        if (track) {
+          this.audioEl.src = track.file;
+          const lyricsEl = document.getElementById('hudLyrics');
+          if (lyricsEl) lyricsEl.textContent = track.lyrics;
+          if (typeof selectChord === 'function') {
+            selectChord(track.defaultChord);
+          }
+        }
+      }
+
+      play() {
+        if (!this.engine.ctx) this.engine.init();
+        if (this.engine.ctx.state === 'suspended') {
+          this.engine.ctx.resume();
+        }
+
+        const vol = parseFloat(document.getElementById('bgVolumeSlider').value);
+        this.audioEl.volume = vol;
+        this.audioEl.play().catch(e => console.warn("Audio play prevented:", e));
+        this.isPlaying = true;
+      }
+
+      pause() {
+        this.audioEl.pause();
+        this.isPlaying = false;
+      }
+    }
+
+    /* ==========================================================================
+       3. CHORD LIBRARY & FINGERINGS
+       ========================================================================== */
+    const CHORD_LIBRARY = {
+      'C': {
+        name: 'C Major',
+        notes: ['mute', 'C3', 'E3', 'G3', 'C4', 'E4'],
+        openOrMute: ['X', 'O', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 4, fret: 1, finger: 1, label: 'Index on 2nd String, Fret 1' },
+          { string: 2, fret: 2, finger: 2, label: 'Middle on 4th String, Fret 2' },
+          { string: 1, fret: 3, finger: 3, label: 'Ring on 5th String, Fret 3' }
+        ]
+      },
+      'G': {
+        name: 'G Major',
+        notes: ['G2', 'B2', 'D3', 'G3', 'D4', 'G4'],
+        openOrMute: ['O', 'O', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 1, fret: 2, finger: 1, label: 'Index on 5th String, Fret 2' },
+          { string: 0, fret: 3, finger: 2, label: 'Middle on 6th String, Fret 3' },
+          { string: 5, fret: 3, finger: 3, label: 'Ring on 1st String, Fret 3' }
+        ]
+      },
+      'D': {
+        name: 'D Major',
+        notes: ['mute', 'mute', 'D3', 'A3', 'D4', 'Gb4'],
+        openOrMute: ['X', 'X', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 3, fret: 2, finger: 1, label: 'Index on 3rd String, Fret 2' },
+          { string: 5, fret: 2, finger: 2, label: 'Middle on 1st String, Fret 2' },
+          { string: 4, fret: 3, finger: 3, label: 'Ring on 2nd String, Fret 3' }
+        ]
+      },
+      'Em': {
+        name: 'E Minor',
+        notes: ['E2', 'B2', 'E3', 'G3', 'B3', 'E4'],
+        openOrMute: ['O', 'O', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 1, fret: 2, finger: 2, label: 'Middle on 5th String, Fret 2' },
+          { string: 2, fret: 2, finger: 3, label: 'Ring on 4th String, Fret 2' }
+        ]
+      },
+      'Am': {
+        name: 'A Minor',
+        notes: ['mute', 'A2', 'E3', 'A3', 'C4', 'E4'],
+        openOrMute: ['X', 'O', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 4, fret: 1, finger: 1, label: 'Index on 2nd String, Fret 1' },
+          { string: 2, fret: 2, finger: 2, label: 'Middle on 4th String, Fret 2' },
+          { string: 3, fret: 2, finger: 3, label: 'Ring on 3rd String, Fret 2' }
+        ]
+      },
+      'E': {
+        name: 'E Major',
+        notes: ['E2', 'B2', 'E3', 'Ab3', 'B3', 'E4'],
+        openOrMute: ['O', 'O', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 3, fret: 1, finger: 1, label: 'Index on 3rd String, Fret 1' },
+          { string: 1, fret: 2, finger: 2, label: 'Middle on 5th String, Fret 2' },
+          { string: 2, fret: 2, finger: 3, label: 'Ring on 4th String, Fret 2' }
+        ]
+      },
+      'A': {
+        name: 'A Major',
+        notes: ['mute', 'A2', 'E3', 'A3', 'Db4', 'E4'],
+        openOrMute: ['X', 'O', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 2, fret: 2, finger: 1, label: 'Index on 4th String, Fret 2' },
+          { string: 3, fret: 2, finger: 2, label: 'Middle on 3rd String, Fret 2' },
+          { string: 4, fret: 2, finger: 3, label: 'Ring on 2nd String, Fret 2' }
+        ]
+      },
+      'F': {
+        name: 'F Major',
+        notes: ['F2', 'C3', 'F3', 'A3', 'C4', 'F4'],
+        openOrMute: ['O', 'O', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 4, fret: 1, finger: 1, label: 'Index on 2nd String, Fret 1' },
+          { string: 3, fret: 2, finger: 2, label: 'Middle on 3rd String, Fret 2' },
+          { string: 2, fret: 3, finger: 3, label: 'Ring on 4th String, Fret 3' },
+          { string: 1, fret: 3, finger: 4, label: 'Pinky on 5th String, Fret 3' }
+        ]
+      },
+      'Dm': {
+        name: 'D Minor',
+        notes: ['mute', 'mute', 'D3', 'A3', 'D4', 'F4'],
+        openOrMute: ['X', 'X', 'O', 'O', 'O', 'O'],
+        fingers: [
+          { string: 5, fret: 1, finger: 1, label: 'Index on 1st String, Fret 1' },
+          { string: 3, fret: 2, finger: 2, label: 'Middle on 3rd String, Fret 2' },
+          { string: 4, fret: 3, finger: 3, label: 'Ring on 2nd String, Fret 3' }
+        ]
+      }
+    };
+
+    guitarAudio = new RealGuitarAudio();
+    songPlayer = new SongPlayer(guitarAudio);
+
+    /* ==========================================================================
+       4. INTERACTIVE FRETBOARD CANVAS RENDERER
+       ========================================================================== */
+    const STRING_NAMES = ['6 (E)', '5 (A)', '4 (D)', '3 (G)', '2 (B)', '1 (e)'];
+    const FINGER_COLORS = { 1: '#38bdf8', 2: '#4ade80', 3: '#fbbf24', 4: '#c084fc' };
+
+    function resizeFretboardCanvas() {
+      if (!fCanvas || !fCtx) return;
+      const rect = fCanvas.getBoundingClientRect();
+      fCanvas.width = rect.width * window.devicePixelRatio;
+      fCanvas.height = rect.height * window.devicePixelRatio;
+      fCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      drawFretboard();
+    }
+
+    window.addEventListener('resize', resizeFretboardCanvas);
+
+    function drawFretboard() {
+      if (!fCanvas || !fCtx) return;
+      const w = fCanvas.width / window.devicePixelRatio;
+      const h = fCanvas.height / window.devicePixelRatio;
+
+      fCtx.clearRect(0, 0, w, h);
+
+      const grad = fCtx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, "#2c1f18");
+      grad.addColorStop(1, "#18120d");
+      fCtx.fillStyle = grad;
+      fCtx.fillRect(0, 0, w, h);
+
+      const numFrets = 4;
+      const leftMargin = 60;
+      const rightMargin = 20;
+      const fretWidth = (w - leftMargin - rightMargin) / numFrets;
+
+      const topMargin = 18;
+      const bottomMargin = 18;
+      const stringSpacing = (h - topMargin - bottomMargin) / 5;
+
+      // Draw Nut
+      fCtx.fillStyle = "#e2e8f0";
+      fCtx.fillRect(leftMargin - 6, topMargin - 4, 6, h - topMargin - bottomMargin + 8);
+
+      // Frets
+      fCtx.fillStyle = "#cbd5e1";
+      for (let f = 1; f <= numFrets; f++) {
+        const fx = leftMargin + f * fretWidth;
+        fCtx.fillRect(fx - 2, topMargin - 4, 3, h - topMargin - bottomMargin + 8);
+
+        fCtx.fillStyle = "#64748b";
+        fCtx.font = "bold 11px -apple-system, sans-serif";
+        fCtx.textAlign = "center";
+        fCtx.fillText(`Fret ${f}`, fx - fretWidth * 0.5, h - 5);
+        fCtx.fillStyle = "#cbd5e1";
+      }
+
+      // Pearl Dot at Fret 3
+      const dotX = leftMargin + 2.5 * fretWidth;
+      const dotY = topMargin + 2.5 * stringSpacing;
+      fCtx.fillStyle = "rgba(255, 255, 255, 0.25)";
+      fCtx.beginPath();
+      fCtx.arc(dotX, dotY, 6, 0, Math.PI * 2);
+      fCtx.fill();
+
+      const chord = CHORD_LIBRARY[activeChordKey] || CHORD_LIBRARY['Em'];
+      const stringGauges = [3.4, 2.8, 2.2, 1.8, 1.4, 1.0];
+
+      // Draw 6 Strings
+      for (let s = 0; s < 6; s++) {
+        const sy = topMargin + s * stringSpacing;
+
+        fCtx.fillStyle = "#94a3b8";
+        fCtx.font = "bold 11px monospace";
+        fCtx.textAlign = "left";
+        fCtx.fillText(STRING_NAMES[s], 8, sy + 4);
+
+        const status = chord.openOrMute[s];
+        fCtx.textAlign = "center";
+        if (status === 'X') {
+          fCtx.fillStyle = "#ef4444";
+          fCtx.font = "bold 14px -apple-system, sans-serif";
+          fCtx.fillText("×", leftMargin - 15, sy + 5);
+        } else {
+          const hasFinger = chord.fingers.some(f => f.string === s);
+          if (!hasFinger) {
+            fCtx.fillStyle = "#22c55e";
+            fCtx.font = "bold 13px -apple-system, sans-serif";
+            fCtx.fillText("O", leftMargin - 15, sy + 5);
+          }
+        }
+
+        fCtx.fillStyle = "#cbd5e1";
+        fCtx.fillRect(leftMargin, sy - stringGauges[s] * 0.5, w - leftMargin - rightMargin, stringGauges[s]);
+      }
+
+      // Draw Finger Placement Dots
+      chord.fingers.forEach(f => {
+        const fx = leftMargin + (f.fret - 0.5) * fretWidth;
+        const fy = topMargin + f.string * stringSpacing;
+        const color = FINGER_COLORS[f.finger] || '#e5b95c';
+
+        fCtx.fillStyle = color;
+        fCtx.beginPath();
+        fCtx.arc(fx, fy, 13, 0, Math.PI * 2);
+        fCtx.fill();
+
+        fCtx.fillStyle = "#000000";
+        fCtx.font = "bold 13px -apple-system, sans-serif";
+        fCtx.textAlign = "center";
+        fCtx.textBaseline = "middle";
+        fCtx.fillText(f.finger, fx, fy);
+      });
+    }
+
+    /* ==========================================================================
+       5. STAGE CANVAS & AIR STRUMMING DETECTOR
+       ========================================================================== */
+    const resonanceRings = [];
+
+    const HAND_CONNECTIONS = [
+      [0, 1], [1, 2], [2, 3], [3, 4],
+      [0, 5], [5, 6], [6, 7], [7, 8],
+      [5, 9], [9, 10], [10, 11], [11, 12],
+      [9, 13], [13, 14], [14, 15], [15, 16],
+      [13, 17], [17, 18], [18, 19], [19, 20],
+      [0, 17]
+    ];
+
+    async function initApp() {
+      initDomReferences();
+      const startBtn = document.getElementById('startBtn');
+      const initError = document.getElementById('initError');
+      if (startBtn) startBtn.textContent = "⏳ Requesting camera...";
+      if (initError) initError.style.display = "none";
+
+      try {
+        // Safe audio init so it never blocks camera
+        try {
+          if (guitarAudio) await guitarAudio.init();
+        } catch (audioErr) {
+          console.warn("Audio Context init warning:", audioErr);
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error("Webcam access requires http://localhost:8081 or HTTPS. navigator.mediaDevices is not available on this origin.");
+        }
+
+        const videoFeed = document.getElementById('webcam');
+        if (videoFeed) videoFeed.muted = true;
+
+        let stream = null;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 960 }, height: { ideal: 720 }, facingMode: "user" },
+            audio: false
+          });
+        } catch (e1) {
+          console.warn("Standard constraints failed, trying basic video:", e1);
+          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        }
+
+        if (videoFeed) {
+          videoFeed.srcObject = stream;
+          try {
+            await videoFeed.play();
+          } catch (playErr) {
+            console.warn("Video play error:", playErr);
+          }
+        }
+
+        if (startBtn) startBtn.textContent = "⏳ Initializing MediaPipe...";
+
+        if (typeof Hands === "undefined") {
+          for (let r = 0; r < 10; r++) {
+            if (typeof Hands !== "undefined") break;
+            await new Promise(res => setTimeout(res, 200));
+          }
+        }
+
+        if (typeof Hands !== "undefined") {
+          handsDetector = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`
+          });
+
+          handsDetector.setOptions({
+            maxNumHands: 2,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.55,
+            minTrackingConfidence: 0.55
+          });
+
+          handsDetector.onResults(onHandResults);
+        } else {
+          console.warn("MediaPipe Hands CDN not yet ready; video stream active.");
+        }
+
+        if (startOverlay) startOverlay.classList.add('hidden');
+        isWebcamRunning = true;
+        if (trackingDot) trackingDot.classList.add('live');
+        if (trackingText) trackingText.textContent = "Live Camera Active";
+
+        resizeCanvas();
+        resizeFretboardCanvas();
+        requestAnimationFrame(renderLoop);
+
+      } catch (err) {
+        console.error("Camera Init Error:", err);
+        let userMsg = `Camera error (${err.name || "Error"}): ${err.message}`;
+        if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+          userMsg = `🔒 Camera permission was blocked. Click the lock/tune icon in your Chrome address bar (left of http://localhost:8081) and set Camera to "Allow", then reload!`;
+        } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
+          userMsg = `📹 Your camera is currently in use by another tab or app (Zoom/FaceTime/another browser tab). Please close that app/tab and click Retry!`;
+        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+          userMsg = `📷 No webcam found. Click "Test with Mouse / Touch Demo" below to play immediately!`;
+        }
+        initError.innerHTML = userMsg;
+        initError.style.display = "block";
+        startBtn.textContent = "🔄 Retry Camera";
+      }
+    }
+
+    function startMouseDemo() {
+      guitarAudio.init();
+      startOverlay.classList.add('hidden');
+      isMouseDemo = true;
+      trackingDot.classList.add('live');
+      trackingText.textContent = "Mouse Demo Active";
+      resizeCanvas();
+      resizeFretboardCanvas();
+      requestAnimationFrame(renderLoop);
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+
+    // Mouse drag strum fallback
+    let mouseStartY = null;
+    canvas.addEventListener('mousedown', (e) => {
+      guitarAudio.init();
+      mouseStartY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (mouseStartY !== null) {
+        const dy = e.clientY - mouseStartY;
+        if (Math.abs(dy) > 15) {
+          executeAirStrum(dy > 0, Math.abs(dy) / 25, e.clientX, e.clientY);
+        }
+        mouseStartY = null;
+      }
+    });
+
+    function renderLoop() {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+
+      // Draw clean un-tinted webcam video
+      ctx.save();
+      if (isWebcamRunning && webcamElement && webcamElement.readyState >= 2) {
+        ctx.translate(w, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(webcamElement, 0, 0, w, h);
+      } else {
+        ctx.fillStyle = "#0c0e14";
+        ctx.fillRect(0, 0, w, h);
+      }
+      ctx.restore();
+
+      if (isWebcamRunning && handsDetector && !isProcessing && webcamElement && webcamElement.readyState >= 2) {
+        isProcessing = true;
+        handsDetector.send({ image: webcamElement })
+          .then(() => { isProcessing = false; })
+          .catch(() => { isProcessing = false; });
+      }
+
+      // Draw Resonance Rings
+      for (let i = resonanceRings.length - 1; i >= 0; i--) {
+        const ring = resonanceRings[i];
+        ring.radius += 3.2;
+        ring.opacity -= 0.04;
+
+        if (ring.opacity <= 0 || ring.radius >= ring.maxRadius) {
+          resonanceRings.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.strokeStyle = ring.downstroke ? "rgba(229, 185, 92, " + ring.opacity + ")" : "rgba(255, 255, 255, " + ring.opacity + ")";
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    /* Hand Landmarks & AIR STRUMMING */
+    function onHandResults(results) {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      const now = performance.now();
+
+      let strumHandY = null;
+      let strumHandX = null;
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        results.multiHandLandmarks.forEach((rawLandmarks) => {
+          const points = rawLandmarks.map((pt, idx) => ({
+            x: (1 - pt.x) * w,
+            y: pt.y * h,
+            idx
+          }));
+
+          const wrist = points[0];
+
+          ctx.save();
+          ctx.lineWidth = 1.8;
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+
+          HAND_CONNECTIONS.forEach(([i1, i2]) => {
+            ctx.beginPath();
+            ctx.moveTo(points[i1].x, points[i1].y);
+            ctx.lineTo(points[i2].x, points[i2].y);
+            ctx.stroke();
+          });
+
+          points.forEach(pt => {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          ctx.restore();
+
+          if (wrist.x < w * 0.55) {
+            strumHandX = (points[8].x + points[4].x) * 0.5;
+            strumHandY = (points[8].y + points[4].y) * 0.5;
+          }
+        });
+      }
+
+      if (strumHandY !== null) {
+        if (prevStrumY !== null) {
+          const dy = strumHandY - prevStrumY;
+
+          if (Math.abs(dy) > 13 && (now - lastStrumTime > 140)) {
+            const isDownstroke = dy > 0;
+            const velocity = Math.min(1.4, Math.max(0.4, Math.abs(dy) / 22));
+
+            executeAirStrum(isDownstroke, velocity, strumHandX, strumHandY);
+            lastStrumTime = now;
+          }
+        }
+        prevStrumY = strumHandY;
+      } else {
+        prevStrumY = null;
+      }
+    }
+
+    function executeAirStrum(downstroke, velocity, x, y) {
+      const chord = CHORD_LIBRARY[activeChordKey] || CHORD_LIBRARY['Em'];
+
+      // Play real guitar chord strum
+      guitarAudio.strumChord(chord.notes, velocity, downstroke);
+
+      resonanceRings.push({
+        x: x || 250,
+        y: y || 250,
+        radius: 10,
+        maxRadius: 75,
+        opacity: 0.85,
+        downstroke
+      });
+
+      totalStrums++;
+      hudTotalStrums.textContent = totalStrums;
+      hudActingStatus.textContent = downstroke ? "⬇️ DOWNSTROKE" : "⬆️ UPSTROKE";
+
+      // AIR GUITARIST ROCKSTAR MODE:
+      // When you strum in the air, the song track kicks in!
+      if (rockstarAirMode) {
+        if (!songPlayer.isPlaying) {
+          songPlayer.play();
+          btnPlayBg.textContent = "⏸️ Pause Song";
+          bgTrackStatus.textContent = "🔥 Vocals and guitar playing in sync with your strumming!";
+        }
+
+        // Advance song chords along the progression
+        const track = songPlayer.trackFiles[songPlayer.currentTrackKey];
+        if (track && track.progression && track.progression.length > 1) {
+          songProgressionIndex = (songProgressionIndex + 1) % track.progression.length;
+          selectChord(track.progression[songProgressionIndex], false);
+        }
+
+        // Pause if no strumming for 2 seconds
+        if (rockstarPauseTimer) clearTimeout(rockstarPauseTimer);
+        rockstarPauseTimer = setTimeout(() => {
+          if (rockstarAirMode && songPlayer.isPlaying) {
+            songPlayer.pause();
+            btnPlayBg.textContent = "▶️ Play Song";
+            hudActingStatus.textContent = "Strum to Jam!";
+            bgTrackStatus.textContent = "Paused · Strum in the air to resume the track!";
+          }
+        }, 2000);
+      }
+    }
+
+    function selectChord(chordKey, resetIndex = true) {
+      activeChordKey = chordKey;
+      const chord = CHORD_LIBRARY[chordKey] || CHORD_LIBRARY['Em'];
+
+      if (hudChord) hudChord.textContent = chordKey;
+      if (hudFullName) hudFullName.textContent = chord.name;
+
+      if (hudVoicingPills) {
+        hudVoicingPills.innerHTML = '';
+        chord.notes.forEach((note, idx) => {
+          const pill = document.createElement('span');
+          pill.className = 'voicing-pill';
+          pill.textContent = note === 'mute' ? `S${6-idx}: ×` : `S${6-idx}: ${note}`;
+          hudVoicingPills.appendChild(pill);
+        });
+      }
+
+      if (hudFingerSteps) {
+        hudFingerSteps.innerHTML = '';
+        chord.fingers.forEach(f => {
+          const step = document.createElement('span');
+          step.className = 'finger-step-pill';
+          step.textContent = f.label;
+          hudFingerSteps.appendChild(step);
+        });
+      }
+
+      document.querySelectorAll('.chord-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === chordKey);
+      });
+
+      if (resetIndex) {
+        songProgressionIndex = 0;
+      }
+
+      drawFretboard();
+    }
+
+    /* Background Song Controls */
+    function togglePlayBgSong() {
+      if (guitarAudio) guitarAudio.init();
+      if (songPlayer.isPlaying) {
+        songPlayer.pause();
+        if (btnPlayBg) btnPlayBg.textContent = "▶️ Play Song";
+        if (bgTrackStatus) bgTrackStatus.textContent = "Paused";
+      } else {
+        songPlayer.play();
+        if (btnPlayBg) btnPlayBg.textContent = "⏸️ Pause Song";
+        if (bgTrackStatus) bgTrackStatus.textContent = "Playing vocals & guitar...";
+      }
+    }
+
+    function changeTrack(key) {
+      songPlayer.setTrack(key);
+      songProgressionIndex = 0;
+      if (songPlayer.isPlaying) {
+        songPlayer.play();
+      }
+      if (bgTrackStatus) bgTrackStatus.textContent = `Selected ${songPlayer.trackFiles[key]?.title || key}. Strum to play!`;
+    }
+
+    function toggleRockstarMode(val) {
+      rockstarAirMode = val;
+      if (!val && songPlayer.isPlaying) {
+        if (rockstarPauseTimer) clearTimeout(rockstarPauseTimer);
+      }
+    }
+
+    function setBgVolume(val) {
+      if (songPlayer && songPlayer.audioEl) {
+        songPlayer.audioEl.volume = parseFloat(val);
+      }
+    }
+
+    function setStrumVolume(val) {
+      if (guitarAudio && guitarAudio.strumGain) {
+        guitarAudio.strumGain.gain.setValueAtTime(parseFloat(val), guitarAudio.ctx.currentTime);
+      }
+    }
+
+    function loadUserAudioFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (guitarAudio) guitarAudio.init();
+      const url = URL.createObjectURL(file);
+      songPlayer.audioEl.src = url;
+      songPlayer.audioEl.play();
+      songPlayer.isPlaying = true;
+      if (btnPlayBg) btnPlayBg.textContent = "⏸️ Pause Song";
+
+      const lyricsEl = document.getElementById('hudLyrics');
+      if (lyricsEl) lyricsEl.textContent = `"${file.name}"`;
+      if (bgTrackStatus) bgTrackStatus.textContent = `Playing ${file.name}. Strum in the air to jam!`;
+    }
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (guitarAudio) guitarAudio.init();
+      const keys = {
+        '1': 'C', '2': 'G', '3': 'D', '4': 'Em',
+        '5': 'Am', '6': 'E', '7': 'A', '8': 'F', '9': 'Dm'
+      };
+      if (keys[e.key]) {
+        selectChord(keys[e.key]);
+      } else if (e.code === 'Space') {
+        executeAirStrum(true, 0.9, 300, 300);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDomReferences();
+      resizeFretboardCanvas();
+      if (songPlayer) songPlayer.setTrack('pani_da_rang');
+      selectChord('Em');
+    });
+  </script>
+</body>
+</html>

@@ -4,10 +4,22 @@ Real guitar playing simulator with **MediaPipe Hand Tracking**, an **Interactive
 
 ---
 
-## ⚡ Quick Start
+## 🚀 Live Demo (Play Online Anywhere)
 
-The app is live right now:
-👉 **[http://localhost:8081](http://localhost:8081)**
+Play directly in your browser without installing anything:
+👉 **[https://dhrgupta096.github.io/Air-Guitar/](https://dhrgupta096.github.io/Air-Guitar/)**
+
+*(Works on any browser with webcam permissions enabled!)*
+
+---
+
+## 💻 Local Quick Start
+
+To run locally on your own machine:
+```bash
+python3 server.py
+```
+Then open: **[http://localhost:8081](http://localhost:8081)**
 
 ---
 

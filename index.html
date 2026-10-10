@@ -18,18 +18,25 @@
 
   <style>
     :root {
-      --bg: #0b0d14;
-      --card-bg: rgba(16, 20, 32, 0.94);
-      --border: rgba(255, 255, 255, 0.12);
-      --gold: #e5b95c;
+      --bg: #07090e;
+      --card-bg: rgba(14, 18, 28, 0.78);
+      --card-bg-elevated: rgba(20, 26, 40, 0.92);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.18);
+      --border-active: rgba(245, 158, 11, 0.45);
+      --gold: #f59e0b;
+      --gold-hover: #fbbf24;
+      --gold-glow: rgba(245, 158, 11, 0.3);
+      --gold-subtle: rgba(245, 158, 11, 0.12);
       --fret-wood: #261c16;
-      --fret-wood-dark: #1a120e;
+      --fret-wood-dark: #150f0c;
       --finger-1: #38bdf8;
-      --finger-2: #4ade80;
+      --finger-2: #34d399;
       --finger-3: #fbbf24;
       --finger-4: #c084fc;
       --text: #f8fafc;
       --text-muted: #94a3b8;
+      --text-dim: #64748b;
     }
 
     * {
@@ -41,7 +48,7 @@
     }
 
     body {
-      background-color: var(--bg);
+      background: radial-gradient(circle at 50% -10%, #171e33 0%, #090c14 55%, #05060a 100%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -51,26 +58,90 @@
       overflow-x: hidden;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 12px;
+    /* TOP NAVBAR */
+    .top-navbar {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      margin-bottom: 14px;
+      background: rgba(14, 18, 30, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
     }
 
-    h1 {
-      font-size: 2.1rem;
-      font-weight: 800;
-      color: #ffffff;
+    .brand-group {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      letter-spacing: -0.01em;
+      gap: 12px;
     }
 
-    p.subtitle {
+    .brand-icon {
+      font-size: 1.8rem;
+      filter: drop-shadow(0 0 12px var(--gold-glow));
+    }
+
+    .brand-text-col h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 70%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--gold-subtle);
+      border: 1px solid var(--border-active);
+      color: var(--gold);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-weight: 800;
+      -webkit-text-fill-color: var(--gold);
+    }
+
+    .brand-subtitle {
+      font-size: 0.78rem;
       color: var(--text-muted);
-      font-size: 0.94rem;
-      margin-top: 3px;
+      margin-top: 2px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-pill-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
     }
 
     .main-container {
@@ -82,15 +153,23 @@
       width: 100%;
     }
 
+    /* STAGE WRAPPER */
     .stage-wrapper {
       position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
       max-height: 640px;
-      border-radius: 18px;
+      border-radius: 20px;
       overflow: hidden;
       background: #000000;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border), 0 0 50px rgba(245, 158, 11, 0.06);
+      transition: all 0.3s ease;
+    }
+
+    .stage-wrapper:fullscreen {
+      border-radius: 0;
+      max-height: 100vh;
+      aspect-ratio: auto;
     }
 
     video#webcam {
@@ -104,7 +183,7 @@
       cursor: pointer;
     }
 
-    /* Live HUD */
+    /* STAGE LIVE HUD OVERLAY */
     .hud-overlay {
       position: absolute;
       top: 14px;
@@ -118,79 +197,156 @@
     }
 
     .chord-card {
-      background: rgba(12, 16, 26, 0.92);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      border-radius: 14px;
+      background: rgba(10, 14, 24, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 16px;
       padding: 12px 18px;
       display: flex;
       flex-direction: column;
       max-width: 440px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      pointer-events: auto;
+      transition: transform 0.2s ease;
     }
 
     .chord-title-row {
       display: flex;
       align-items: baseline;
-      gap: 10px;
+      gap: 12px;
     }
 
     .chord-name-huge {
-      font-size: 2.8rem;
+      font-size: 3rem;
       font-weight: 900;
       color: var(--gold);
       line-height: 1;
+      filter: drop-shadow(0 2px 12px var(--gold-glow));
+      letter-spacing: -0.03em;
     }
 
     .chord-full-name {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.1rem;
+      font-weight: 800;
       color: #ffffff;
+      letter-spacing: -0.01em;
     }
 
     .lyrics-tag {
       font-size: 0.92rem;
       font-weight: 600;
       color: #e2e8f0;
-      margin-top: 4px;
+      margin-top: 6px;
       font-style: italic;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lyrics-tag::before {
+      content: '🎵';
+      font-size: 0.8rem;
+      font-style: normal;
     }
 
     .chord-voicing-pills {
       display: flex;
       gap: 6px;
-      margin-top: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
     }
 
     .voicing-pill {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 3px 8px;
       border-radius: 6px;
       font-size: 0.74rem;
-      font-family: monospace;
-      color: #e2e8f0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #cbd5e1;
+      transition: all 0.2s;
+    }
+
+    /* CENTER STRUM VELOCITY GAUGE */
+    .strum-velocity-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .velocity-hud-pill {
+      background: rgba(12, 16, 28, 0.88);
+      border: 1px solid var(--border-active);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 30px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .velocity-label {
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+
+    .velocity-bar-track {
+      width: 90px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .velocity-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), #fef08a);
+      border-radius: 3px;
+      transition: width 0.12s ease-out;
+    }
+
+    .velocity-pct {
+      font-size: 0.76rem;
+      font-family: ui-monospace, monospace;
+      font-weight: 800;
+      color: #ffffff;
+      min-width: 32px;
+      text-align: right;
     }
 
     .metrics-hud {
       display: flex;
       gap: 10px;
+      pointer-events: auto;
     }
 
     .metric-card {
-      background: rgba(12, 16, 26, 0.92);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      border-radius: 12px;
+      background: rgba(10, 14, 24, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 14px;
       padding: 8px 14px;
       text-align: right;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .metric-title {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-muted);
+      font-weight: 700;
     }
 
     .metric-value {
@@ -203,10 +359,11 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.55);
       padding: 6px 12px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 600;
       border: 1px solid var(--border);
     }
 
@@ -215,22 +372,151 @@
       height: 8px;
       border-radius: 50%;
       background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
     }
 
     .dot.live {
       background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+      animation: pulseDot 2s infinite ease-in-out;
     }
 
-    /* BACKGROUND SONG & VOCALS BAR */
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+
+    /* STAGE BOTTOM CONTROLS */
+    .stage-bottom-bar {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .stage-pill-btn {
+      background: rgba(10, 14, 24, 0.8);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .stage-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--border-hover);
+    }
+
+    /* START OVERLAY */
+    .start-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 9, 14, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      padding: 30px;
+      text-align: center;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .start-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .start-overlay h2 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .start-overlay p {
+      max-width: 520px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      line-height: 1.55;
+      margin-bottom: 24px;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #050608;
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 14px 34px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 30px var(--gold-glow);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(245, 158, 11, 0.45);
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    }
+
+    .primary-btn:active {
+      transform: translateY(1px);
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      margin-top: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--border-hover);
+    }
+
+    /* SONG MIXER & VOCALS DECK (STUDIO STRIP) */
     .bg-song-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 20px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 18px;
+      padding: 16px 20px;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
     }
 
     .bg-song-row {
@@ -241,8 +527,15 @@
       gap: 12px;
     }
 
+    .song-deck-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     .song-title-label {
-      font-size: 0.86rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--gold);
       display: flex;
@@ -251,232 +544,90 @@
     }
 
     .song-dropdown {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.07);
       color: #ffffff;
       border: 1px solid var(--border);
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 0.86rem;
+      font-size: 0.88rem;
       outline: none;
+      transition: border 0.2s;
+    }
+
+    .song-dropdown:hover, .song-dropdown:focus {
+      border-color: var(--border-active);
     }
 
     .song-dropdown option {
-      background: #101420;
+      background: #0f1422;
       color: #ffffff;
     }
 
     .audio-btn {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border);
       color: #ffffff;
-      padding: 7px 16px;
+      padding: 8px 16px;
       border-radius: 10px;
       font-size: 0.86rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       transition: all 0.2s ease;
     }
 
     .audio-btn:hover {
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--border-hover);
     }
 
     .audio-btn.primary {
-      background: var(--gold);
-      color: #0c0e14;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #07090e;
       border-color: var(--gold);
+      box-shadow: 0 4px 16px var(--gold-glow);
     }
 
     .audio-btn.primary:hover {
-      background: #f0ca72;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      box-shadow: 0 6px 22px rgba(245, 158, 11, 0.4);
     }
 
-    .volume-slider-group {
+    .visualizer-wrapper {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .volume-slider-group input[type="range"] {
-      width: 90px;
-      accent-color: var(--gold);
-      cursor: pointer;
-    }
-
-    /* REAL GUITAR FRETBOARD INTERACTIVE PANEL */
-    .fretboard-card {
-      background: var(--card-bg);
+      background: rgba(0, 0, 0, 0.35);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px 20px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      padding: 4px 10px;
+      border-radius: 10px;
     }
 
-    .fretboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .fretboard-title {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--gold);
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .fret-finger-legend {
-      display: flex;
-      gap: 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .finger-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.65rem;
-      font-weight: 800;
-      color: #000000;
-    }
-
-    .fretboard-canvas-container {
-      position: relative;
-      width: 100%;
-      height: 145px;
-      background: linear-gradient(180deg, var(--fret-wood), var(--fret-wood-dark));
-      border-radius: 12px;
-      border: 2px solid #3d2b20;
-      box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.7);
-      overflow: hidden;
-    }
-
-    canvas#fretboardCanvas {
-      width: 100%;
-      height: 100%;
+    canvas#audioVisualizer {
+      width: 140px;
+      height: 24px;
       display: block;
     }
 
-    .chord-instruction {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 0.88rem;
-      color: #cbd5e1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .finger-steps {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .finger-step-pill {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #ffffff;
-    }
-
-    /* Controls Panel */
-    .controls-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px 20px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .control-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .panel-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .panel-label {
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      font-weight: 700;
-    }
-
-    .chord-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border);
-      color: var(--text);
-      min-width: 52px;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 0.92rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .chord-btn:hover {
-      background: rgba(255, 255, 255, 0.14);
-    }
-
-    .chord-btn.active {
-      background: var(--gold);
-      color: #0c0e14;
-      border-color: var(--gold);
-      box-shadow: 0 4px 14px rgba(229, 185, 92, 0.35);
-    }
-
-    /* Toggle Switch */
+    /* TOGGLE SWITCH */
     .toggle-wrapper {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      transition: border 0.2s;
+    }
+
+    .toggle-wrapper:hover {
+      border-color: var(--border-hover);
     }
 
     .toggle-switch {
@@ -497,7 +648,8 @@
       height: 20px;
       background: white;
       border-radius: 50%;
-      transition: transform 0.3s;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
 
     .toggle-checkbox {
@@ -506,118 +658,381 @@
 
     .toggle-checkbox:checked + .toggle-switch {
       background: var(--gold);
+      box-shadow: 0 0 14px var(--gold-glow);
     }
 
     .toggle-checkbox:checked + .toggle-switch::after {
       transform: translateX(20px);
     }
 
-    /* Start Overlay */
-    .start-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(10, 12, 18, 0.94);
-      backdrop-filter: blur(14px);
+    .volume-slider-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .volume-slider-group span.vol-icon {
+      font-size: 1rem;
+    }
+
+    .volume-slider-group input[type="range"] {
+      width: 95px;
+      height: 6px;
+      accent-color: var(--gold);
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    /* REAL GUITAR FRETBOARD INTERACTIVE PANEL */
+    .fretboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 18px;
+      padding: 16px 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+    }
+
+    .fretboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fretboard-title {
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fret-finger-legend {
+      display: flex;
+      gap: 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .finger-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 900;
+      color: #050608;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .fretboard-canvas-container {
+      position: relative;
+      width: 100%;
+      height: 152px;
+      background: linear-gradient(180deg, #2b1f18 0%, #17110e 100%);
+      border-radius: 14px;
+      border: 2px solid #453225;
+      box-shadow: inset 0 6px 16px rgba(0, 0, 0, 0.8), 0 8px 24px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    canvas#fretboardCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .fretboard-hint-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .chord-instruction {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .finger-steps {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .finger-step-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* MPC-STYLE CHORD SELECTOR PADS */
+    .controls-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 18px;
+      padding: 18px 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chord-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+      gap: 10px;
+      width: 100%;
+    }
+
+    .chord-pad {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 8px;
+      border-radius: 12px;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 30;
-      padding: 30px;
-      text-align: center;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
+      gap: 3px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
 
-    .start-overlay.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .start-overlay h2 {
-      font-size: 2.1rem;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 8px;
-    }
-
-    .start-overlay p {
-      max-width: 520px;
-      color: var(--text-muted);
-      font-size: 0.96rem;
-      line-height: 1.5;
-      margin-bottom: 22px;
-    }
-
-    .primary-btn {
-      background: var(--gold);
-      color: #0c0e14;
-      font-size: 1rem;
-      font-weight: 800;
-      padding: 13px 32px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(229, 185, 92, 0.3);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .primary-btn:hover {
+    .chord-pad:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-hover);
       transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(229, 185, 92, 0.45);
     }
 
-    .secondary-btn {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-      font-size: 0.88rem;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      margin-top: 14px;
-      transition: background 0.2s ease;
+    .chord-pad:active {
+      transform: scale(0.96);
     }
 
-    .secondary-btn:hover {
-      background: rgba(255, 255, 255, 0.16);
+    .chord-pad.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #07090e;
+      border-color: var(--gold);
+      box-shadow: 0 6px 20px var(--gold-glow);
+      transform: translateY(-2px);
     }
 
+    .chord-pad-key {
+      font-size: 1.25rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .chord-pad-sub {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+    }
+
+    .chord-pad-keynum {
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      font-size: 0.62rem;
+      font-family: ui-monospace, monospace;
+      font-weight: 800;
+      opacity: 0.55;
+    }
+
+    .chord-pad.active .chord-pad-keynum {
+      opacity: 0.85;
+      color: #07090e;
+    }
+
+    /* GUIDE CARDS */
     .guide-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
       width: 100%;
     }
 
     .guide-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
+      border-radius: 14px;
+      padding: 14px 18px;
       font-size: 0.88rem;
       color: var(--text-muted);
-      line-height: 1.4;
+      line-height: 1.45;
+      backdrop-filter: blur(12px);
     }
 
     .guide-card strong {
-      color: #fff;
-      display: block;
-      margin-bottom: 4px;
-      font-size: 0.92rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 0.94rem;
+    }
+
+    /* SHORTCUTS MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 12, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-dialog {
+      background: #0f1422;
+      border: 1px solid var(--border-active);
+      border-radius: 18px;
+      max-width: 480px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.open .modal-dialog {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .shortcut-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.9rem;
+    }
+
+    .shortcut-key-badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: ui-monospace, monospace;
+      font-weight: 800;
+      color: var(--gold);
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🎸 REAL GUITAR SIMULATOR</h1>
-    <p class="subtitle">Act on guitar with natural air strumming while real acoustic guitar & vocal backing tracks play in sync.</p>
-  </header>
+  <!-- Top Glass Navbar -->
+  <nav class="top-navbar">
+    <div class="brand-group">
+      <span class="brand-icon">🎸</span>
+      <div class="brand-text-col">
+        <h1>STRUM AIR <span class="brand-badge">STUDIO V2</span></h1>
+        <div class="brand-subtitle">Natural Air Strumming · Real Acoustic Guitar & Vocal Backing Jam</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-pill-btn" onclick="openShortcutsModal()">⌨️ Shortcuts</button>
+      <button class="nav-pill-btn" onclick="toggleFullscreenStage()">⛶ Fullscreen</button>
+    </div>
+  </nav>
 
   <div class="main-container">
-    <div class="stage-wrapper">
+    <div class="stage-wrapper" id="stageWrapper">
       <video id="webcam" playsinline autoplay muted></video>
       <canvas id="trackingCanvas"></canvas>
 
@@ -630,6 +1045,17 @@
           </div>
           <div class="lyrics-tag" id="hudLyrics">"Pani da rang vekh ke... akhiyaan 'ch hanju rul de..."</div>
           <div class="chord-voicing-pills" id="hudVoicingPills"></div>
+        </div>
+
+        <!-- Center Velocity Gauge -->
+        <div class="strum-velocity-center">
+          <div class="velocity-hud-pill" id="hudVelocityPill">
+            <span class="velocity-label" id="hudVelocityLabel">🎸 STRUM TO JAM</span>
+            <div class="velocity-bar-track">
+              <div class="velocity-bar-fill" id="hudVelocityFill"></div>
+            </div>
+            <span class="velocity-pct" id="hudVelocityPct">0%</span>
+          </div>
         </div>
 
         <div class="metrics-hud">
@@ -650,11 +1076,18 @@
         </div>
       </div>
 
+      <!-- Stage Bottom Action Bar -->
+      <div class="stage-bottom-bar">
+        <button class="stage-pill-btn" onclick="toggleCameraMirror()">🔄 <span id="mirrorBtnText">Mirror On</span></button>
+        <button class="stage-pill-btn" onclick="toggleMuteAudio()">🔊 <span id="muteBtnText">Sound On</span></button>
+        <button class="stage-pill-btn" onclick="toggleFullscreenStage()">⛶ Fullscreen</button>
+      </div>
+
       <!-- Start Overlay -->
       <div class="start-overlay" id="startOverlay">
-        <h2>Acoustic Guitar Jam Ready</h2>
+        <h2>Acoustic Studio Jam Ready</h2>
         <p>
-          Turn on your camera! Strum in the air with your hands to play authentic acoustic guitar chords along with real vocal backing tracks.
+          Turn on your camera! Strum naturally in the air with your hands to trigger authentic acoustic steel strings while live vocal backing tracks play in harmony.
         </p>
         <button class="primary-btn" id="startBtn" onclick="initApp()">🎸 Start Camera & Jam</button>
         <button class="secondary-btn" onclick="startMouseDemo()">🖱️ Test with Mouse / Touch Demo</button>
@@ -662,12 +1095,12 @@
       </div>
     </div>
 
-    <!-- BACKGROUND VOCALS & SONG CONTROLS -->
+    <!-- BACKGROUND VOCALS & SONG CONTROLS (STUDIO MIXER DECK) -->
     <div class="bg-song-card">
       <div class="bg-song-row">
-        <div class="panel-group">
+        <div class="song-deck-header">
           <span class="song-title-label">
-            <span>🎤 Song & Vocal Track:</span>
+            <span>🎤 Vocal & Guitar Track:</span>
             <select id="bgSongSelect" class="song-dropdown" onchange="changeTrack(this.value)">
               <option value="pani_da_rang">🌟 Pani Da Rang (Acoustic Vocal + Guitar)</option>
               <option value="mitti_di_khushboo">🌾 Mitti Di Khushboo (Acoustic Vocal + Guitar)</option>
@@ -680,28 +1113,32 @@
           <button class="audio-btn primary" id="btnPlayBg" onclick="togglePlayBgSong()">▶️ Play Song</button>
           
           <label class="audio-btn" style="cursor: pointer;">
-            📁 Load Any MP3 File
+            📁 Load Any MP3
             <input type="file" id="userAudioFile" accept="audio/*" style="display: none;" onchange="loadUserAudioFile(event)">
           </label>
         </div>
 
-        <div class="panel-group">
-          <label class="toggle-wrapper" title="When enabled, the song plays smoothly when you are strumming/acting in the air, and pauses if you stop!">
-            <input type="checkbox" id="rockstarModeToggle" class="toggle-checkbox" checked onchange="toggleRockstarMode(this.checked)">
-            <div class="toggle-switch"></div>
-            <span style="font-size: 0.86rem; font-weight: 700; color: var(--gold);">Air Guitarist Mode (Strum to Play)</span>
-          </label>
+        <div class="visualizer-wrapper">
+          <canvas id="audioVisualizer" width="140" height="24"></canvas>
         </div>
+
+        <label class="toggle-wrapper" title="When enabled, the song plays smoothly when you are strumming/acting in the air, and pauses if you stop!">
+          <input type="checkbox" id="rockstarModeToggle" class="toggle-checkbox" checked onchange="toggleRockstarMode(this.checked)">
+          <div class="toggle-switch"></div>
+          <span style="font-size: 0.86rem; font-weight: 700; color: var(--gold);">Air Guitarist Mode</span>
+        </label>
       </div>
 
       <div class="bg-song-row" style="font-size: 0.84rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px;">
         <div class="volume-slider-group">
+          <span class="vol-icon">🎤</span>
           <span>Song / Vocal Vol:</span>
           <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="setBgVolume(this.value)">
         </div>
 
         <div class="volume-slider-group">
-          <span>Your Hand Strum Vol:</span>
+          <span class="vol-icon">🎸</span>
+          <span>Your Air Strum Vol:</span>
           <input type="range" id="strumVolumeSlider" min="0" max="1.5" step="0.05" value="1.0" oninput="setStrumVolume(this.value)">
         </div>
 
@@ -713,7 +1150,7 @@
     <div class="fretboard-card">
       <div class="fretboard-header">
         <div class="fretboard-title">
-          <span>🎸 Interactive Fretboard — Exact Finger Pressing Points</span>
+          <span>🎸 Interactive Rosewood Fretboard — Exact Finger Pressing Points</span>
         </div>
         <div class="fret-finger-legend">
           <div class="legend-item"><span class="finger-dot" style="background: var(--finger-1);">1</span> Index</div>
@@ -729,49 +1166,103 @@
         <canvas id="fretboardCanvas"></canvas>
       </div>
 
+      <div class="fretboard-hint-row">
+        <span style="color: var(--gold); font-size: 0.8rem;">💡 Tip: Click any string on the fretboard above to pluck that individual string note!</span>
+        <span style="color: var(--text-muted); font-size: 0.8rem;">Frets 1 – 4 · Standard EADGBe Tuning</span>
+      </div>
+
       <div class="chord-instruction">
-        <span style="font-weight: 700; color: #ffffff;">How to Press this Chord:</span>
+        <span style="font-weight: 700; color: #ffffff;">Finger Placement Guide:</span>
         <div class="finger-steps" id="hudFingerSteps"></div>
       </div>
     </div>
 
-    <!-- CHORD SELECTOR PANEL -->
+    <!-- CHORD SELECTOR PANEL (MPC PADS) -->
     <div class="controls-panel">
-      <div class="control-row">
-        <div class="panel-group">
-          <span class="panel-label">Select Chord:</span>
-          <button class="chord-btn" onclick="selectChord('C')">C</button>
-          <button class="chord-btn" onclick="selectChord('G')">G</button>
-          <button class="chord-btn" onclick="selectChord('D')">D</button>
-          <button class="chord-btn active" onclick="selectChord('Em')">Em</button>
-          <button class="chord-btn" onclick="selectChord('Am')">Am</button>
-          <button class="chord-btn" onclick="selectChord('E')">E</button>
-          <button class="chord-btn" onclick="selectChord('A')">A</button>
-          <button class="chord-btn" onclick="selectChord('F')">F</button>
-          <button class="chord-btn" onclick="selectChord('Dm')">Dm</button>
-        </div>
+      <div class="panel-header-row">
+        <span class="panel-label">🎛️ Select Chord (MPC Pads)</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Press keys [1]–[9] to switch, [Space] to strum</span>
+      </div>
 
-        <div class="panel-group">
-          <span class="panel-label">Keys:</span>
-          <span style="font-size: 0.82rem; color: var(--text-muted);">1–9 switch chords, Space strums</span>
-        </div>
+      <div class="chord-grid">
+        <button class="chord-pad" onclick="selectChord('C')">
+          <span class="chord-pad-key">C</span>
+          <span class="chord-pad-sub">Major</span>
+          <span class="chord-pad-keynum">1</span>
+        </button>
+        <button class="chord-pad" onclick="selectChord('G')">
+          <span class="chord-pad-key">G</span>
+          <span class="chord-pad-sub">Major</span>
+          <span class="chord-pad-keynum">2</span>
+        </button>
+        <button class="chord-pad" onclick="selectChord('D')">
+          <span class="chord-pad-key">D</span>
+          <span class="chord-pad-sub">Major</span>
+          <span class="chord-pad-keynum">3</span>
+        </button>
+        <button class="chord-pad active" onclick="selectChord('Em')">
+          <span class="chord-pad-key">Em</span>
+          <span class="chord-pad-sub">Minor</span>
+          <span class="chord-pad-keynum">4</span>
+        </button>
+        <button class="chord-pad" onclick="selectChord('Am')">
+          <span class="chord-pad-key">Am</span>
+          <span class="chord-pad-sub">Minor</span>
+          <span class="chord-pad-keynum">5</span>
+        </button>
+        <button class="chord-pad" onclick="selectChord('E')">
+          <span class="chord-pad-key">E</span>
+          <span class="chord-pad-sub">Major</span>
+          <span class="chord-pad-keynum">6</span>
+        </button>
+        <button class="chord-pad" onclick="selectChord('A')">
+          <span class="chord-pad-key">A</span>
+          <span class="chord-pad-sub">Major</span>
+          <span class="chord-pad-keynum">7</span>
+        </button>
+        <button class="chord-pad" onclick="selectChord('F')">
+          <span class="chord-pad-key">F</span>
+          <span class="chord-pad-sub">Major</span>
+          <span class="chord-pad-keynum">8</span>
+        </button>
+        <button class="chord-pad" onclick="selectChord('Dm')">
+          <span class="chord-pad-key">Dm</span>
+          <span class="chord-pad-sub">Minor</span>
+          <span class="chord-pad-keynum">9</span>
+        </button>
       </div>
     </div>
 
     <!-- Quick Guide -->
     <div class="guide-cards">
       <div class="guide-card">
-        <strong>1. Air Guitarist Mode (Acting on Guitar)</strong>
+        <strong>⚡ 1. Air Guitarist Mode (Acting on Guitar)</strong>
         Act like you are playing the guitar! When you strum down or up in the air, the vocals and acoustic guitar play along in sync with your hand movement.
       </div>
       <div class="guide-card">
-        <strong>2. Real Vocals + Real Strums</strong>
+        <strong>🎸 2. Real Vocals + Real Strums</strong>
         The background audio plays authentic vocal tracks, while your hands strum real acoustic steel strings layered on top in perfect harmony.
       </div>
       <div class="guide-card">
-        <strong>3. Exact Finger Placement</strong>
+        <strong>🖐️ 3. Exact Finger Placement</strong>
         The interactive fretboard shows the exact strings and frets to press for each chord (`Em`, `D`, `C`, `G`, etc.) as the song progresses!
       </div>
+    </div>
+  </div>
+
+  <!-- SHORTCUTS MODAL DIALOG -->
+  <div class="modal-overlay" id="shortcutsModal" onclick="closeShortcutsModal(event)">
+    <div class="modal-dialog" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">⌨️ Keyboard & Gesture Shortcuts</div>
+        <button class="modal-close-btn" onclick="closeShortcutsModal()">×</button>
+      </div>
+      <div class="shortcut-row"><span>Select Chords (C, G, D, Em, Am, E, A, F, Dm)</span><span class="shortcut-key-badge">1 – 9</span></div>
+      <div class="shortcut-row"><span>Air Strum (Instant Trigger)</span><span class="shortcut-key-badge">Space</span></div>
+      <div class="shortcut-row"><span>Play / Pause Backing Track</span><span class="shortcut-key-badge">P</span></div>
+      <div class="shortcut-row"><span>Mute Audio</span><span class="shortcut-key-badge">M</span></div>
+      <div class="shortcut-row"><span>Toggle Fullscreen Stage</span><span class="shortcut-key-badge">F</span></div>
+      <div class="shortcut-row"><span>Close Modal</span><span class="shortcut-key-badge">Esc</span></div>
     </div>
   </div>
 
@@ -799,6 +1290,17 @@
     var bgTrackStatus = null;
     var btnPlayBg = null;
     var bgVolumeSlider = null;
+
+    var hudVelocityPill = null;
+    var hudVelocityLabel = null;
+    var hudVelocityFill = null;
+    var hudVelocityPct = null;
+    var audioVisualizer = null;
+    var visCtx = null;
+    var shortcutsModal = null;
+    var isCameraMirrored = true;
+    var isMuted = false;
+    var stringVibrations = [0, 0, 0, 0, 0, 0];
 
     var isWebcamRunning = false;
     var isMouseDemo = false;
@@ -833,6 +1335,53 @@
       bgTrackStatus = document.getElementById('bgTrackStatus');
       btnPlayBg = document.getElementById('btnPlayBg');
       bgVolumeSlider = document.getElementById('bgVolumeSlider');
+
+      hudVelocityPill = document.getElementById('hudVelocityPill');
+      hudVelocityLabel = document.getElementById('hudVelocityLabel');
+      hudVelocityFill = document.getElementById('hudVelocityFill');
+      hudVelocityPct = document.getElementById('hudVelocityPct');
+      audioVisualizer = document.getElementById('audioVisualizer');
+      if (audioVisualizer) visCtx = audioVisualizer.getContext('2d');
+      shortcutsModal = document.getElementById('shortcutsModal');
+    }
+
+    function toggleCameraMirror() {
+      isCameraMirrored = !isCameraMirrored;
+      const btn = document.getElementById('mirrorBtnText');
+      if (btn) btn.textContent = isCameraMirrored ? "Mirror On" : "Mirror Off";
+    }
+
+    function toggleFullscreenStage() {
+      const stage = document.getElementById('stageWrapper') || document.querySelector('.stage-wrapper');
+      if (!document.fullscreenElement) {
+        if (stage && stage.requestFullscreen) {
+          stage.requestFullscreen().catch(err => console.warn("Fullscreen request error:", err));
+        }
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    function toggleMuteAudio() {
+      isMuted = !isMuted;
+      if (guitarAudio && guitarAudio.masterGain && guitarAudio.ctx) {
+        guitarAudio.masterGain.gain.setValueAtTime(isMuted ? 0 : 0.95, guitarAudio.ctx.currentTime);
+      }
+      if (songPlayer && songPlayer.audioEl) {
+        songPlayer.audioEl.muted = isMuted;
+      }
+      const btn = document.getElementById('muteBtnText');
+      if (btn) btn.textContent = isMuted ? "Muted" : "Sound On";
+    }
+
+    function openShortcutsModal() {
+      if (!shortcutsModal) shortcutsModal = document.getElementById('shortcutsModal');
+      if (shortcutsModal) shortcutsModal.classList.add('open');
+    }
+
+    function closeShortcutsModal(e) {
+      if (!shortcutsModal) shortcutsModal = document.getElementById('shortcutsModal');
+      if (shortcutsModal) shortcutsModal.classList.remove('open');
     }
 
     // Initialize immediate DOM references as HTML is already parsed
@@ -1141,11 +1690,22 @@
 
       fCtx.clearRect(0, 0, w, h);
 
+      // Realistic Rosewood woodgrain
       const grad = fCtx.createLinearGradient(0, 0, 0, h);
       grad.addColorStop(0, "#2c1f18");
-      grad.addColorStop(1, "#18120d");
+      grad.addColorStop(0.5, "#201611");
+      grad.addColorStop(1, "#150f0c");
       fCtx.fillStyle = grad;
       fCtx.fillRect(0, 0, w, h);
+
+      fCtx.strokeStyle = "rgba(0, 0, 0, 0.22)";
+      fCtx.lineWidth = 1;
+      for (let gy = 4; gy < h; gy += 6) {
+        fCtx.beginPath();
+        fCtx.moveTo(0, gy);
+        fCtx.lineTo(w, gy);
+        fCtx.stroke();
+      }
 
       const numFrets = 4;
       const leftMargin = 60;
@@ -1156,36 +1716,49 @@
       const bottomMargin = 18;
       const stringSpacing = (h - topMargin - bottomMargin) / 5;
 
-      // Draw Nut
+      // Draw Bone Nut
       fCtx.fillStyle = "#e2e8f0";
       fCtx.fillRect(leftMargin - 6, topMargin - 4, 6, h - topMargin - bottomMargin + 8);
+      fCtx.fillStyle = "rgba(0,0,0,0.3)";
+      fCtx.fillRect(leftMargin - 1, topMargin - 4, 1, h - topMargin - bottomMargin + 8);
 
-      // Frets
-      fCtx.fillStyle = "#cbd5e1";
+      // Frets (Nickel silver with 3D crown highlight)
       for (let f = 1; f <= numFrets; f++) {
         const fx = leftMargin + f * fretWidth;
-        fCtx.fillRect(fx - 2, topMargin - 4, 3, h - topMargin - bottomMargin + 8);
+        fCtx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        fCtx.fillRect(fx - 2, topMargin - 4, 4, h - topMargin - bottomMargin + 8);
 
-        fCtx.fillStyle = "#64748b";
+        fCtx.fillStyle = "#cbd5e1";
+        fCtx.fillRect(fx - 1, topMargin - 4, 2, h - topMargin - bottomMargin + 8);
+
+        fCtx.fillStyle = "#94a3b8";
         fCtx.font = "bold 11px -apple-system, sans-serif";
         fCtx.textAlign = "center";
         fCtx.fillText(`Fret ${f}`, fx - fretWidth * 0.5, h - 5);
-        fCtx.fillStyle = "#cbd5e1";
       }
 
-      // Pearl Dot at Fret 3
+      // Mother of Pearl Dot at Fret 3
       const dotX = leftMargin + 2.5 * fretWidth;
       const dotY = topMargin + 2.5 * stringSpacing;
-      fCtx.fillStyle = "rgba(255, 255, 255, 0.25)";
+      fCtx.save();
+      fCtx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      fCtx.shadowColor = "rgba(255, 255, 255, 0.3)";
+      fCtx.shadowBlur = 6;
       fCtx.beginPath();
-      fCtx.arc(dotX, dotY, 6, 0, Math.PI * 2);
+      fCtx.arc(dotX, dotY, 6.5, 0, Math.PI * 2);
       fCtx.fill();
+      fCtx.restore();
 
       const chord = CHORD_LIBRARY[activeChordKey] || CHORD_LIBRARY['Em'];
-      const stringGauges = [3.4, 2.8, 2.2, 1.8, 1.4, 1.0];
+      const stringGauges = [3.6, 2.9, 2.3, 1.8, 1.4, 1.0];
 
-      // Draw 6 Strings
+      // Draw 6 Strings with vibration physics and metallic shaders
       for (let s = 0; s < 6; s++) {
+        const vib = (stringVibrations[s] || 0) * Math.sin(performance.now() * 0.06 + s) * 3.5;
+        if (stringVibrations[s] > 0.01) {
+          stringVibrations[s] *= 0.94;
+        }
+
         const sy = topMargin + s * stringSpacing;
 
         fCtx.fillStyle = "#94a3b8";
@@ -1208,26 +1781,70 @@
           }
         }
 
-        fCtx.fillStyle = "#cbd5e1";
-        fCtx.fillRect(leftMargin, sy - stringGauges[s] * 0.5, w - leftMargin - rightMargin, stringGauges[s]);
+        // Shadow
+        fCtx.fillStyle = "rgba(0, 0, 0, 0.45)";
+        fCtx.fillRect(leftMargin, sy + vib + 1.2, w - leftMargin - rightMargin, stringGauges[s]);
+
+        // Metallic string body
+        const isBronze = s < 3;
+        const strGrad = fCtx.createLinearGradient(0, sy + vib - stringGauges[s], 0, sy + vib + stringGauges[s]);
+        if (isBronze) {
+          strGrad.addColorStop(0, "#fde68a");
+          strGrad.addColorStop(0.5, "#d97706");
+          strGrad.addColorStop(1, "#78350f");
+        } else {
+          strGrad.addColorStop(0, "#ffffff");
+          strGrad.addColorStop(0.5, "#cbd5e1");
+          strGrad.addColorStop(1, "#475569");
+        }
+        fCtx.fillStyle = strGrad;
+        fCtx.fillRect(leftMargin, sy + vib - stringGauges[s] * 0.5, w - leftMargin - rightMargin, stringGauges[s]);
       }
 
-      // Draw Finger Placement Dots
+      // Draw Finger Placement Dots with glowing pulse rings
       chord.fingers.forEach(f => {
         const fx = leftMargin + (f.fret - 0.5) * fretWidth;
-        const fy = topMargin + f.string * stringSpacing;
-        const color = FINGER_COLORS[f.finger] || '#e5b95c';
+        const vib = (stringVibrations[f.string] || 0) * Math.sin(performance.now() * 0.06 + f.string) * 3.5;
+        const fy = topMargin + f.string * stringSpacing + vib;
+        const color = FINGER_COLORS[f.finger] || '#f59e0b';
 
+        fCtx.save();
+        fCtx.shadowColor = color;
+        fCtx.shadowBlur = 12;
         fCtx.fillStyle = color;
         fCtx.beginPath();
-        fCtx.arc(fx, fy, 13, 0, Math.PI * 2);
+        fCtx.arc(fx, fy, 13.5, 0, Math.PI * 2);
         fCtx.fill();
+        fCtx.restore();
 
-        fCtx.fillStyle = "#000000";
+        fCtx.fillStyle = "#050608";
         fCtx.font = "bold 13px -apple-system, sans-serif";
         fCtx.textAlign = "center";
         fCtx.textBaseline = "middle";
         fCtx.fillText(f.finger, fx, fy);
+      });
+    }
+
+    // Interactive String Click-to-Pluck
+    if (fCanvas) {
+      fCanvas.addEventListener('click', (e) => {
+        if (guitarAudio) guitarAudio.init();
+        const rect = fCanvas.getBoundingClientRect();
+        const clickY = (e.clientY - rect.top) * (fCanvas.height / (rect.height * window.devicePixelRatio));
+        const topMargin = 18;
+        const bottomMargin = 18;
+        const h = fCanvas.height / window.devicePixelRatio;
+        const stringSpacing = (h - topMargin - bottomMargin) / 5;
+        const s = Math.round((clickY - topMargin) / stringSpacing);
+        if (s >= 0 && s < 6) {
+          const chord = CHORD_LIBRARY[activeChordKey] || CHORD_LIBRARY['Em'];
+          const note = chord.notes[s];
+          if (note && note !== 'mute') {
+            guitarAudio.playNote(note, 0.95);
+            stringVibrations[s] = 1.0;
+            drawFretboard();
+          }
+        }
       });
     }
 
@@ -1380,13 +1997,31 @@
       // Draw clean un-tinted webcam video
       ctx.save();
       if (isWebcamRunning && webcamElement && webcamElement.readyState >= 2) {
-        ctx.translate(w, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(webcamElement, 0, 0, w, h);
+        if (isCameraMirrored) {
+          ctx.translate(w, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(webcamElement, 0, 0, w, h);
+        } else {
+          ctx.drawImage(webcamElement, 0, 0, w, h);
+        }
       } else {
-        ctx.fillStyle = "#0c0e14";
+        ctx.fillStyle = "#07090e";
         ctx.fillRect(0, 0, w, h);
       }
+      ctx.restore();
+
+      // Subtle non-intrusive Air Strum Zone watermark (high-tech aesthetic)
+      ctx.save();
+      ctx.strokeStyle = "rgba(245, 158, 11, 0.16)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.arc(w * 0.28, h * 0.58, h * 0.32, -0.6 * Math.PI, 0.6 * Math.PI);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(245, 158, 11, 0.3)";
+      ctx.font = "bold 11px -apple-system, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("AIR STRUM ZONE ↕", w * 0.28, h * 0.28);
       ctx.restore();
 
       if (isWebcamRunning && handsDetector && !isProcessing && webcamElement && webcamElement.readyState >= 2) {
@@ -1399,8 +2034,8 @@
       // Draw Resonance Rings
       for (let i = resonanceRings.length - 1; i >= 0; i--) {
         const ring = resonanceRings[i];
-        ring.radius += 3.2;
-        ring.opacity -= 0.04;
+        ring.radius += 3.4;
+        ring.opacity -= 0.038;
 
         if (ring.opacity <= 0 || ring.radius >= ring.maxRadius) {
           resonanceRings.splice(i, 1);
@@ -1408,12 +2043,50 @@
         }
 
         ctx.save();
-        ctx.strokeStyle = ring.downstroke ? "rgba(229, 185, 92, " + ring.opacity + ")" : "rgba(255, 255, 255, " + ring.opacity + ")";
-        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = ring.downstroke ? "rgba(245, 158, 11, " + ring.opacity + ")" : "rgba(255, 255, 255, " + ring.opacity + ")";
+        ctx.lineWidth = 2.4;
         ctx.beginPath();
         ctx.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
+      }
+
+      // Real-time Audio Spectrum Visualizer
+      if (audioVisualizer && visCtx) {
+        const vw = audioVisualizer.width;
+        const vh = audioVisualizer.height;
+        visCtx.clearRect(0, 0, vw, vh);
+
+        const numBars = 12;
+        const barWidth = 6;
+        const barGap = 5;
+        const totalW = numBars * barWidth + (numBars - 1) * barGap;
+        const startX = (vw - totalW) / 2;
+
+        const isAudioActive = (songPlayer && songPlayer.isPlaying) || (performance.now() - lastStrumTime < 1400);
+
+        for (let b = 0; b < numBars; b++) {
+          let barH = 3;
+          if (isAudioActive) {
+            const freq = Math.sin(performance.now() * 0.008 * (b + 1) + b) * 0.5 + 0.5;
+            const strumBoost = Math.max(0, 1 - (performance.now() - lastStrumTime) / 1200);
+            barH = Math.max(3, (freq * 0.6 + strumBoost * 0.4) * (vh - 4));
+          }
+          const bx = startX + b * (barWidth + barGap);
+          const by = vh - barH;
+
+          const grad = visCtx.createLinearGradient(0, vh, 0, 0);
+          grad.addColorStop(0, "rgba(245, 158, 11, 0.5)");
+          grad.addColorStop(1, "rgba(254, 240, 138, 0.95)");
+
+          visCtx.fillStyle = grad;
+          visCtx.fillRect(bx, by, barWidth, barH);
+        }
+      }
+
+      // Fretboard string vibration continuous rendering
+      if (stringVibrations.some(v => v > 0.01)) {
+        drawFretboard();
       }
 
       requestAnimationFrame(renderLoop);
@@ -1431,7 +2104,7 @@
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         results.multiHandLandmarks.forEach((rawLandmarks) => {
           const points = rawLandmarks.map((pt, idx) => ({
-            x: (1 - pt.x) * w,
+            x: isCameraMirrored ? (1 - pt.x) * w : pt.x * w,
             y: pt.y * h,
             idx
           }));
@@ -1450,7 +2123,7 @@
           });
 
           points.forEach(pt => {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
             ctx.beginPath();
             ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
             ctx.fill();
@@ -1488,26 +2161,49 @@
       // Play real guitar chord strum
       guitarAudio.strumChord(chord.notes, velocity, downstroke);
 
+      // Trigger string vibrations
+      chord.notes.forEach((n, idx) => {
+        if (n && n !== 'mute') {
+          stringVibrations[idx] = 1.0;
+        }
+      });
+      drawFretboard();
+
       resonanceRings.push({
         x: x || 250,
         y: y || 250,
-        radius: 10,
-        maxRadius: 75,
-        opacity: 0.85,
+        radius: 12,
+        maxRadius: 85,
+        opacity: 0.9,
         downstroke
       });
 
       totalStrums++;
-      hudTotalStrums.textContent = totalStrums;
-      hudActingStatus.textContent = downstroke ? "⬇️ DOWNSTROKE" : "⬆️ UPSTROKE";
+      if (hudTotalStrums) hudTotalStrums.textContent = totalStrums;
+      if (hudActingStatus) hudActingStatus.textContent = downstroke ? "⬇️ DOWNSTROKE" : "⬆️ UPSTROKE";
+
+      // Update Center Velocity Gauge HUD
+      if (hudVelocityLabel && hudVelocityFill && hudVelocityPct) {
+        hudVelocityLabel.textContent = downstroke ? "⬇️ DOWNSTROKE" : "⬆️ UPSTROKE";
+        const pct = Math.min(100, Math.round(velocity * 75));
+        hudVelocityFill.style.width = pct + "%";
+        hudVelocityPct.textContent = pct + "%";
+        if (hudVelocityPill) {
+          hudVelocityPill.style.opacity = "1";
+          hudVelocityPill.style.transform = "scale(1.05)";
+          setTimeout(() => {
+            if (hudVelocityPill) hudVelocityPill.style.transform = "scale(1)";
+          }, 180);
+        }
+      }
 
       // AIR GUITARIST ROCKSTAR MODE:
       // When you strum in the air, the song track kicks in!
       if (rockstarAirMode) {
         if (!songPlayer.isPlaying) {
           songPlayer.play();
-          btnPlayBg.textContent = "⏸️ Pause Song";
-          bgTrackStatus.textContent = "🔥 Vocals and guitar playing in sync with your strumming!";
+          if (btnPlayBg) btnPlayBg.textContent = "⏸️ Pause Song";
+          if (bgTrackStatus) bgTrackStatus.textContent = "🔥 Vocals and guitar playing in sync with your strumming!";
         }
 
         // Advance song chords along the progression
@@ -1522,9 +2218,9 @@
         rockstarPauseTimer = setTimeout(() => {
           if (rockstarAirMode && songPlayer.isPlaying) {
             songPlayer.pause();
-            btnPlayBg.textContent = "▶️ Play Song";
-            hudActingStatus.textContent = "Strum to Jam!";
-            bgTrackStatus.textContent = "Paused · Strum in the air to resume the track!";
+            if (btnPlayBg) btnPlayBg.textContent = "▶️ Play Song";
+            if (hudActingStatus) hudActingStatus.textContent = "Strum to Jam!";
+            if (bgTrackStatus) bgTrackStatus.textContent = "Paused · Strum in the air to resume the track!";
           }
         }, 2000);
       }
@@ -1557,8 +2253,16 @@
         });
       }
 
+      // Update MPC pads
+      document.querySelectorAll('.chord-pad').forEach(btn => {
+        const keySpan = btn.querySelector('.chord-pad-key');
+        const key = keySpan ? keySpan.textContent.trim() : btn.textContent.trim();
+        btn.classList.toggle('active', key === chordKey);
+      });
+
+      // Update regular buttons fallback
       document.querySelectorAll('.chord-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.textContent === chordKey);
+        btn.classList.toggle('active', btn.textContent.trim() === chordKey);
       });
 
       if (resetIndex) {
@@ -1637,6 +2341,14 @@
         selectChord(keys[e.key]);
       } else if (e.code === 'Space') {
         executeAirStrum(true, 0.9, 300, 300);
+      } else if (e.key === 'p' || e.key === 'P') {
+        togglePlayBgSong();
+      } else if (e.key === 'm' || e.key === 'M') {
+        toggleMuteAudio();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreenStage();
+      } else if (e.key === 'Escape') {
+        closeShortcutsModal();
       }
     });
 

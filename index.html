@@ -1353,6 +1353,93 @@
       font-weight: 700;
     }
 
+    /* REACT BITS: FLYING POSTERS STYLES */
+    .flying-posters-viewport {
+      position: relative;
+      width: 100%;
+      height: 205px;
+      background: #090909;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+      touch-action: pan-y;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .flying-posters-viewport:active,
+    .flying-posters-viewport.flying-posters--dragging {
+      cursor: grabbing;
+    }
+
+    .flying-posters__canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .flying-posters-hud {
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .flying-posters-hint {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: rgba(255, 255, 255, 0.5);
+      background: rgba(14, 14, 14, 0.85);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .flying-posters-active-badge {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(20, 16, 12, 0.88);
+      padding: 3px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .posters-view-toggle-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .posters-view-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .posters-view-toggle-btn.active {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--gold);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
   /* REACT BITS: BUBBLE MENU STYLES */
 .bubble-menu {
   left: 0;
@@ -2052,16 +2139,34 @@
         </label>
       </div>
 
-      <!-- 3D Interactive React Bits OptionWheel Track Selector -->
+      <!-- React Bits: 3D Flying Posters & Option Wheel Showcase Deck -->
       <div class="wheel-strip-container" id="wheelStripContainer">
         <div class="wheel-strip-header">
           <div class="wheel-strip-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10M12 22a10 10 0 0 1-10-10"></path></svg>
-            <span>REACT BITS · OPTION WHEEL TRACK SELECTOR</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span id="postersViewHeaderTitle">REACT BITS · 3D FLYING POSTERS VINYL GALLERY</span>
           </div>
-          <span class="wheel-strip-hint">Scroll wheel · Drag up/down · Arrow keys [↑/↓]</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <button type="button" class="posters-view-toggle-btn active" id="btnToggleFlyingPosters" onclick="togglePostersView('posters')" title="Switch to 3D Flying Posters View">
+              3D Posters
+            </button>
+            <button type="button" class="posters-view-toggle-btn" id="btnToggleOptionWheel" onclick="togglePostersView('wheel')" title="Switch to Option Wheel View">
+              Option Wheel
+            </button>
+          </div>
         </div>
-        <div class="option-wheel-viewport" id="trackOptionWheel"></div>
+
+        <!-- 3D WebGL2 Flying Posters Viewport -->
+        <div class="flying-posters-viewport" id="flyingPostersViewport">
+          <canvas id="flyingPostersCanvas" class="flying-posters__canvas"></canvas>
+          <div class="flying-posters-hud">
+            <span class="flying-posters-hint">Drag · Wheel scroll · Tap poster to load track</span>
+            <span class="flying-posters-active-badge" id="flyingPostersActiveBadge">Track: Pani Da Rang</span>
+          </div>
+        </div>
+
+        <!-- Option Wheel Viewport -->
+        <div class="option-wheel-viewport" id="trackOptionWheel" style="display: none;"></div>
       </div>
 
       <!-- Real-time Song Scrubber & Timeline -->
@@ -3213,6 +3318,608 @@
           }
         }
       });
+    }
+
+    /* ==========================================================================
+       REACT BITS: FLYING POSTERS COMPONENT (3D WEBGL2 INSTANCED POSTER CAROUSEL)
+       ========================================================================== */
+    var flyingPostersInstance = null;
+
+    class FlyingPostersDOM {
+      constructor(canvas, options = {}) {
+        this.canvas = canvas;
+        this.container = canvas.parentElement;
+        this.items = options.items || [];
+        this.planeWidth = options.planeWidth || 250;
+        this.planeHeight = options.planeHeight || 250;
+        this.distortion = options.distortion !== undefined ? options.distortion : 3.0;
+        this.scrollEase = options.scrollEase || 0.025;
+        this.cameraFov = options.cameraFov || 45;
+        this.cameraZ = options.cameraZ || 20;
+        this.columns = 1;
+        this.columnGap = 40;
+        this.alternate = true;
+        this.radius = options.radius !== undefined ? options.radius : 8;
+        this.rotation = options.rotation !== undefined ? options.rotation : 180;
+        this.axis = [0, 1, 0];
+        this.speed = 0;
+        this.lean = 0.35;
+        this.fade = 0.15;
+        this.shading = 0.25;
+        this.wheel = options.wheel !== undefined ? options.wheel : true;
+        this.drag = options.drag !== undefined ? options.drag : true;
+        this.onItemClick = options.onItemClick;
+
+        this.pointer = { active: false, id: -1, origin: 0, startY: 0, startX: 0, start: 0 };
+        this.state = {
+          width: 1,
+          height: 1,
+          dpr: 1,
+          scroll: 0,
+          target: 0,
+          velocity: 0,
+          lean: 0,
+          reveal: 1,
+          slots: 0,
+          count: 0,
+          layoutKey: ''
+        };
+        this.raf = null;
+        this.last = 0;
+        this.visible = true;
+        this.alive = true;
+
+        this.atlas = {
+          canvas: document.createElement('canvas'),
+          cells: 1,
+          cell: 512,
+          images: [],
+          aspect: 1,
+          dirty: false
+        };
+
+        this.initGL();
+      }
+
+      initGL() {
+        this.gl = this.canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: true });
+        if (!this.gl) {
+          console.warn('WebGL2 not available for FlyingPosters, using fallback');
+          this.init2DFallback();
+          return;
+        }
+
+        const gl = this.gl;
+        const vs = `#version 300 es
+in vec2 aPosition;
+in vec4 aPoster;
+uniform mat4 uProjection;
+uniform float uCamera;
+uniform vec2 uPoster;
+uniform float uDepth;
+uniform float uSpacing;
+uniform float uLoop;
+uniform float uColumnGap;
+uniform float uColumns;
+uniform float uScroll;
+uniform float uAlternate;
+uniform float uViewHeight;
+uniform float uRotation;
+uniform float uDistortion;
+uniform vec3 uAxis;
+uniform float uLean;
+out vec2 vUv;
+out float vItem;
+out float vFacing;
+out float vScreenY;
+
+mat4 rotationMatrix(vec3 axis, float angle) {
+  axis = normalize(axis);
+  float s = sin(angle);
+  float c = cos(angle);
+  float oc = 1.0 - c;
+  return mat4(
+    oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s, 0.0,
+    oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0,
+    oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.y * s, oc * axis.z * axis.z + c, 0.0,
+    0.0, 0.0, 0.0, 1.0
+  );
+}
+
+vec3 rotate(vec3 v, vec3 axis, float angle) {
+  return (rotationMatrix(axis, angle) * vec4(v, 1.0)).xyz;
+}
+
+float qinticInOut(float t) {
+  return t < 0.5 ? 16.0 * pow(t, 5.0) : -0.5 * abs(pow(2.0 * t - 2.0, 5.0)) + 1.0;
+}
+
+void main() {
+  float column = aPoster.x;
+  float direction = uAlternate > 0.5 && mod(column, 2.0) > 0.5 ? -1.0 : 1.0;
+  float base = -uLoop * 0.5 + (aPoster.y + 0.5) * uSpacing + column * 0.41 * uSpacing;
+  float y = mod(base - uScroll * direction + uLoop * 0.5, uLoop) - uLoop * 0.5;
+  float x = (column - (uColumns - 1.0) * 0.5) * uColumnGap;
+  float position = 5.0 + (y + uViewHeight) / (2.0 * uViewHeight) * 10.0;
+  float offset = (dot(vec2(1.0, 1.0), aPosition) + 0.25) / 0.5;
+  float progress = clamp(
+    (clamp(position * 0.05, 0.0, 1.0) - 0.01 * uDistortion * offset) / (1.0 - 0.01 * uDistortion),
+    0.0,
+    2.0
+  );
+  float angle = qinticInOut(progress) * uRotation;
+  vec3 local = rotate(vec3(aPosition, 0.0), uAxis, angle);
+  vec3 normal = rotate(vec3(0.0, 0.0, 1.0), uAxis, angle);
+  local = rotate(local * vec3(uPoster, uDepth), vec3(1.0, 0.0, 0.0), uLean * direction);
+  normal = rotate(normal, vec3(1.0, 0.0, 0.0), uLean * direction);
+  vec3 world = local + vec3(x, y, 0.0);
+  gl_Position = uProjection * vec4(world.xy, world.z - uCamera, 1.0);
+  vUv = aPosition + 0.5;
+  vItem = aPoster.z;
+  vFacing = normal.z;
+  vScreenY = gl_Position.y / gl_Position.w;
+}`;
+
+        const fs = `#version 300 es
+precision highp float;
+uniform sampler2D uAtlas;
+uniform float uCells;
+uniform float uInset;
+uniform vec2 uPoster;
+uniform float uRadius;
+uniform float uFade;
+uniform float uShading;
+uniform float uReveal;
+in vec2 vUv;
+in float vItem;
+in float vFacing;
+in float vScreenY;
+out vec4 outColor;
+
+void main() {
+  vec2 p = (vUv - 0.5) * uPoster;
+  float r = min(uRadius, 0.5 * min(uPoster.x, uPoster.y));
+  vec2 q = abs(p) - (0.5 * uPoster - r);
+  float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+  float aa = max(fwidth(d), 0.0001);
+  float mask = r > 0.0 ? 1.0 - smoothstep(-aa, aa, d) : 1.0;
+  vec2 cell = vec2(mod(vItem, uCells), floor(vItem / uCells));
+  vec2 local = vec2(vUv.x, 1.0 - vUv.y);
+  vec4 sampled = texture(uAtlas, (cell + uInset + local * (1.0 - 2.0 * uInset)) / uCells);
+  vec3 color = sampled.rgb;
+  color *= mix(1.0, 0.4 + 0.6 * abs(vFacing), uShading);
+  float t = clamp((1.0 - abs(vScreenY)) / max(uFade, 0.0001), 0.0, 1.0);
+  float fade = uFade > 0.0 ? t * t * t * (t * (t * 6.0 - 15.0) + 10.0) : 1.0;
+  float alpha = sampled.a * mask * fade * uReveal;
+  if (alpha < 0.002) discard;
+  outColor = vec4(color * alpha, alpha);
+}`;
+
+        const vShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vShader, vs);
+        gl.compileShader(vShader);
+
+        const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fShader, fs);
+        gl.compileShader(fShader);
+
+        this.program = gl.createProgram();
+        gl.attachShader(this.program, vShader);
+        gl.attachShader(this.program, fShader);
+        gl.linkProgram(this.program);
+
+        this.uniforms = {};
+        for (const name of [
+          'uProjection', 'uCamera', 'uPoster', 'uDepth', 'uSpacing', 'uLoop',
+          'uColumnGap', 'uColumns', 'uScroll', 'uAlternate', 'uViewHeight',
+          'uRotation', 'uDistortion', 'uAxis', 'uLean', 'uAtlas', 'uCells',
+          'uInset', 'uRadius', 'uFade', 'uShading', 'uReveal'
+        ]) {
+          this.uniforms[name] = gl.getUniformLocation(this.program, name);
+        }
+
+        const GRID_X = 60;
+        const GRID_Y = 1;
+        const positions = [];
+        const indices = [];
+        for (let y = 0; y <= GRID_Y; y++) {
+          for (let x = 0; x <= GRID_X; x++) positions.push(x / GRID_X - 0.5, y / GRID_Y - 0.5);
+        }
+        for (let y = 0; y < GRID_Y; y++) {
+          for (let x = 0; x < GRID_X; x++) {
+            const i = y * (GRID_X + 1) + x;
+            indices.push(i + GRID_X + 1, i, i + GRID_X + 2, i, i + 1, i + GRID_X + 2);
+          }
+        }
+        this.indicesCount = indices.length;
+
+        this.vao = gl.createVertexArray();
+        gl.bindVertexArray(this.vao);
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        const posLoc = gl.getAttribLocation(this.program, 'aPosition');
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+        const idxBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, idxBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+        this.posterBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.posterBuffer);
+        const posterLoc = gl.getAttribLocation(this.program, 'aPoster');
+        gl.enableVertexAttribArray(posterLoc);
+        gl.vertexAttribPointer(posterLoc, 4, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribDivisor(posterLoc, 1);
+
+        gl.bindVertexArray(null);
+
+        this.atlasTexture = gl.createTexture();
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.atlasTexture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+        this.buildAtlas();
+        this.bindEvents();
+        this.resize();
+        this.wake();
+      }
+
+      buildAtlas() {
+        const total = Math.max(1, this.items.length);
+        this.atlas.cells = Math.ceil(Math.sqrt(total));
+        this.atlas.cell = 512;
+        this.atlas.canvas.width = this.atlas.cells * this.atlas.cell;
+        this.atlas.canvas.height = this.atlas.cells * this.atlas.cell;
+        const ctx = this.atlas.canvas.getContext('2d');
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, this.atlas.canvas.width, this.atlas.canvas.height);
+        this.items.forEach((item, index) => {
+          const size = this.atlas.cell;
+          const cx = (index % this.atlas.cells) * size;
+          const cy = Math.floor(index / this.atlas.cells) * size;
+
+          ctx.save();
+          ctx.translate(cx, cy);
+
+          const grad = ctx.createLinearGradient(0, 0, 0, size);
+          grad.addColorStop(0, item.grad ? item.grad[0] : '#1c1917');
+          grad.addColorStop(1, item.grad ? item.grad[1] : '#0c0a09');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, size, size);
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.lineWidth = 1;
+          for (let r = 70; r < 210; r += 14) {
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          ctx.fillStyle = '#171717';
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, 70, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, 10, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(12, 12, size - 24, size - 24);
+
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#737373';
+          ctx.font = '600 13px "JetBrains Mono", monospace';
+          ctx.fillText('STEREO ACOUSTIC MASTER', size / 2, 42);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '700 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+          ctx.fillText(item.title || 'AIR GUITAR TRACK', size / 2, size / 2 - 16);
+
+          ctx.fillStyle = '#f59e0b';
+          ctx.font = '700 14px "JetBrains Mono", monospace';
+          ctx.fillText(item.sub || 'ACOUSTIC SESSION', size / 2, size / 2 + 10);
+
+          ctx.fillStyle = '#d4d4d4';
+          ctx.font = '600 13px "JetBrains Mono", monospace';
+          ctx.fillText((item.note || '') + ' · ' + (item.bpm || '80 BPM'), size / 2, size / 2 + 34);
+
+          ctx.fillStyle = '#737373';
+          ctx.font = '500 11px "JetBrains Mono", monospace';
+          ctx.fillText('REACT BITS · 3D FLYING POSTERS', size / 2, size - 32);
+
+          ctx.restore();
+        });
+
+        const gl = this.gl;
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.atlasTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.atlas.canvas);
+        gl.generateMipmap(gl.TEXTURE_2D);
+      }
+
+      metrics() {
+        const fov = (this.cameraFov * Math.PI) / 180;
+        const REF_FOV = (45 * Math.PI) / 180;
+        const REF_Z = 20;
+        const unit = this.state.height / (2 * Math.tan(REF_FOV / 2) * REF_Z);
+        const distance = this.cameraZ * unit;
+        const spacing = this.planeHeight + 5 * unit;
+        const scale = (2 * distance * Math.tan(fov / 2)) / this.state.height;
+        return { fov, unit, spacing, distance, scale };
+      }
+
+      layout() {
+        const { spacing, scale } = this.metrics();
+        const slots = Math.max(this.items.length, Math.ceil((this.state.height * scale + this.planeHeight) / spacing) + 1);
+        const key = [slots, this.columns, this.items.length].join('|');
+        if (key === this.state.layoutKey) return;
+        this.state.layoutKey = key;
+        this.state.slots = slots;
+        this.state.count = slots * this.columns;
+        const total = Math.max(1, this.items.length);
+        const data = new Float32Array(this.state.count * 4);
+        for (let col = 0; col < this.columns; col++) {
+          for (let slot = 0; slot < slots; slot++) {
+            data.set([col, slot, (slot + col * 2) % total, 0], (col * slots + slot) * 4);
+          }
+        }
+        const gl = this.gl;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.posterBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+      }
+
+      posterAt(clientX, clientY) {
+        const rect = this.canvas.getBoundingClientRect();
+        const { spacing, scale } = this.metrics();
+        const x = (clientX - rect.left - rect.width / 2) * scale;
+        const y = (rect.height / 2 - (clientY - rect.top)) * scale;
+        const loop = this.state.slots * spacing;
+        for (let col = 0; col < this.columns; col++) {
+          const dir = this.alternate && col % 2 === 1 ? -1 : 1;
+          const cx = (col - (this.columns - 1) / 2) * (this.planeWidth + this.columnGap);
+          if (Math.abs(x - cx) > this.planeWidth / 2) continue;
+          for (let slot = 0; slot < this.state.slots; slot++) {
+            const base = -loop / 2 + (slot + 0.5) * spacing + col * 0.41 * spacing;
+            const raw = base - this.state.scroll * dir + loop / 2;
+            const cy = (((raw % loop) + loop) % loop) - loop / 2;
+            if (Math.abs(y - cy) <= this.planeHeight / 2) {
+              return (slot + col * 2) % Math.max(1, this.items.length);
+            }
+          }
+        }
+        return -1;
+      }
+
+      render() {
+        const gl = this.gl;
+        if (!gl) return;
+        const { fov, unit, spacing, distance } = this.metrics();
+        const aspect = this.state.width / this.state.height;
+        const f = 1 / Math.tan(fov / 2);
+        const near = Math.max(0.5, distance * 0.02);
+        const far = distance * 4;
+        const projection = new Float32Array(16);
+        projection[0] = f / aspect;
+        projection[5] = f;
+        projection[10] = (far + near) / (near - far);
+        projection[11] = -1;
+        projection[14] = (2 * far * near) / (near - far);
+
+        gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.disable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+        gl.useProgram(this.program);
+        gl.uniformMatrix4fv(this.uniforms.uProjection, false, projection);
+        gl.uniform1f(this.uniforms.uCamera, distance);
+        gl.uniform2f(this.uniforms.uPoster, this.planeWidth, this.planeHeight);
+        gl.uniform1f(this.uniforms.uDepth, unit);
+        gl.uniform1f(this.uniforms.uSpacing, spacing);
+        gl.uniform1f(this.uniforms.uLoop, this.state.slots * spacing);
+        gl.uniform1f(this.uniforms.uColumnGap, this.planeWidth + this.columnGap);
+        gl.uniform1f(this.uniforms.uColumns, this.columns);
+        gl.uniform1f(this.uniforms.uScroll, this.state.scroll);
+        gl.uniform1f(this.uniforms.uAlternate, this.alternate ? 1 : 0);
+        gl.uniform1f(this.uniforms.uViewHeight, this.state.height);
+        gl.uniform1f(this.uniforms.uRotation, (this.rotation * Math.PI) / 180);
+        gl.uniform1f(this.uniforms.uDistortion, this.distortion);
+        gl.uniform3f(this.uniforms.uAxis, this.axis[0], this.axis[1], this.axis[2]);
+        gl.uniform1f(this.uniforms.uLean, this.state.lean);
+        gl.uniform1f(this.uniforms.uCells, this.atlas.cells);
+        gl.uniform1f(this.uniforms.uInset, 1.5 / this.atlas.cell);
+        gl.uniform1f(this.uniforms.uRadius, this.radius);
+        gl.uniform1f(this.uniforms.uFade, this.fade);
+        gl.uniform1f(this.uniforms.uShading, this.shading);
+        gl.uniform1f(this.uniforms.uReveal, this.state.reveal);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.atlasTexture);
+        gl.bindVertexArray(this.vao);
+        gl.drawElementsInstanced(gl.TRIANGLES, this.indicesCount, gl.UNSIGNED_SHORT, 0, this.state.count);
+        gl.bindVertexArray(null);
+      }
+
+      frame(now) {
+        this.raf = 0;
+        if (!this.alive || !this.visible) return;
+        const dt = this.last ? Math.min(0.05, (now - this.last) / 1000) : 1 / 60;
+        this.last = now;
+        this.layout();
+        const previous = this.state.scroll;
+        this.state.scroll += (this.state.target - this.state.scroll) * (1 - Math.pow(1 - this.scrollEase, dt * 60));
+        this.state.velocity += ((this.state.scroll - previous) / dt - this.state.velocity) * (1 - Math.exp(-dt * 8));
+        const leanTarget = Math.max(-0.5, Math.min(0.5, -this.state.velocity * this.lean * 0.0006));
+        this.state.lean += (leanTarget - this.state.lean) * (1 - Math.exp(-dt * 6));
+        this.render();
+
+        const busy = Math.abs(this.state.target - this.state.scroll) > 0.05 || Math.abs(this.state.lean) > 0.0005;
+        if (busy) {
+          this.raf = requestAnimationFrame(t => this.frame(t));
+        } else {
+          this.last = 0;
+        }
+      }
+
+      wake() {
+        if (this.raf || !this.alive || !this.visible) return;
+        this.raf = requestAnimationFrame(t => this.frame(t));
+      }
+
+      scrollToIndex(index) {
+        const { spacing } = this.metrics();
+        const n = this.items.length;
+        if (n <= 0) return;
+        const targetSlot = ((index % n) + n) % n;
+        this.state.target = targetSlot * spacing;
+        this.wake();
+      }
+
+      bindEvents() {
+        const canvas = this.canvas;
+        const onWheel = e => {
+          if (!this.wheel) return;
+          e.preventDefault();
+          const lines = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? this.state.height : 1;
+          this.state.target += e.deltaY * lines * 0.01 * this.metrics().unit;
+          this.wake();
+        };
+
+        const onPointerDown = e => {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          this.pointer.startX = e.clientX;
+          this.pointer.startY = e.clientY;
+          this.pointer.start = performance.now();
+          if (!this.drag) return;
+          canvas.setPointerCapture?.(e.pointerId);
+          this.pointer.active = true;
+          this.pointer.id = e.pointerId;
+          this.pointer.origin = this.state.scroll;
+          this.wake();
+        };
+
+        const onPointerMove = e => {
+          if (!this.pointer.active || e.pointerId !== this.pointer.id) return;
+          this.state.target = this.pointer.origin + (this.pointer.startY - e.clientY) * 0.1 * this.metrics().unit;
+          this.wake();
+        };
+
+        const onPointerUp = e => {
+          const tap =
+            Math.hypot(e.clientX - this.pointer.startX, e.clientY - this.pointer.startY) < 6 &&
+            performance.now() - this.pointer.start < 450;
+          if (this.pointer.active && e.pointerId === this.pointer.id) {
+            this.pointer.active = false;
+            canvas.releasePointerCapture?.(e.pointerId);
+          }
+          if (tap && this.onItemClick) {
+            const idx = this.posterAt(e.clientX, e.clientY);
+            if (idx >= 0 && idx < this.items.length) {
+              this.onItemClick(this.items[idx], idx);
+            }
+          }
+          this.wake();
+        };
+
+        canvas.addEventListener('wheel', onWheel, { passive: false });
+        canvas.addEventListener('pointerdown', onPointerDown);
+        canvas.addEventListener('pointermove', onPointerMove);
+        canvas.addEventListener('pointerup', onPointerUp);
+        canvas.addEventListener('pointercancel', onPointerUp);
+
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        this.state.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.state.width = Math.max(1, this.container.clientWidth);
+        this.state.height = Math.max(1, this.container.clientHeight);
+        this.canvas.width = Math.round(this.state.width * this.state.dpr);
+        this.canvas.height = Math.round(this.state.height * this.state.dpr);
+        this.state.layoutKey = '';
+        this.layout();
+        this.render();
+        this.wake();
+      }
+
+      init2DFallback() {
+        const ctx = this.canvas.getContext('2d');
+        if (!ctx) return;
+        const render2D = () => {
+          ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          ctx.fillStyle = '#171717';
+          ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+          ctx.fillStyle = '#f59e0b';
+          ctx.font = '14px monospace';
+          ctx.fillText('3D Flying Posters Active', 20, 30);
+        };
+        render2D();
+      }
+    }
+
+    function initFlyingPosters() {
+      const canvas = document.getElementById('flyingPostersCanvas');
+      if (!canvas) return;
+      const trackData = [
+        { title: 'PANI DA RANG', key: 'pani_da_rang', sub: 'ACOUSTIC VOCAL', note: 'KEY: Am · C', bpm: '82 BPM', grad: ['#1c1917', '#0c0a09'] },
+        { title: 'MITTI DI KHUSHBOO', key: 'mitti_di_khushboo', sub: 'STUDIO ACOUSTIC', note: 'KEY: Dm · F', bpm: '80 BPM', grad: ['#18181b', '#09090b'] },
+        { title: 'NAZM NAZM', key: 'nazm_nazm', sub: 'MELODIC FINGERSTYLE', note: 'KEY: C MAJOR', bpm: '90 BPM', grad: ['#27272a', '#18181b'] },
+        { title: 'SAADI GALLI AAJA', key: 'saadi_galli', sub: 'SOULFUL ACOUSTIC', note: 'KEY: G · Em', bpm: '84 BPM', grad: ['#1f1d1a', '#0f0e0c'] },
+        { title: 'SESSION DRUM BEAT', key: 'acoustic_ballad', sub: 'ACOUSTIC GROOVE LOOP', note: 'STUDIO METRONOME', bpm: '85 BPM', grad: ['#1a1a1a', '#0a0a0a'] }
+      ];
+
+      flyingPostersInstance = new FlyingPostersDOM(canvas, {
+        items: trackData,
+        planeWidth: 240,
+        planeHeight: 240,
+        distortion: 3.0,
+        scrollEase: 0.025,
+        cameraFov: 45,
+        cameraZ: 20,
+        onItemClick: (item, index) => {
+          changeTrack(item.key);
+        }
+      });
+    }
+
+    function togglePostersView(view) {
+      const postersVp = document.getElementById('flyingPostersViewport');
+      const wheelVp = document.getElementById('trackOptionWheel');
+      const btnPosters = document.getElementById('btnToggleFlyingPosters');
+      const btnWheel = document.getElementById('btnToggleOptionWheel');
+      const title = document.getElementById('postersViewHeaderTitle');
+      if (view === 'posters') {
+        if (postersVp) postersVp.style.display = 'block';
+        if (wheelVp) wheelVp.style.display = 'none';
+        if (btnPosters) btnPosters.classList.add('active');
+        if (btnWheel) btnWheel.classList.remove('active');
+        if (title) title.textContent = 'REACT BITS · 3D FLYING POSTERS VINYL GALLERY';
+        if (flyingPostersInstance) {
+          flyingPostersInstance.resize();
+          flyingPostersInstance.wake();
+        }
+      } else {
+        if (postersVp) postersVp.style.display = 'none';
+        if (wheelVp) wheelVp.style.display = 'block';
+        if (btnPosters) btnPosters.classList.remove('active');
+        if (btnWheel) btnWheel.classList.add('active');
+        if (title) title.textContent = 'REACT BITS · OPTION WHEEL TRACK SELECTOR';
+      }
     }
 
     function initDomReferences() {
@@ -4404,7 +5111,20 @@
       if (songPlayer.isPlaying) {
         songPlayer.play();
       }
-      if (bgTrackStatus) bgTrackStatus.textContent = `Selected ${songPlayer.trackFiles[key]?.title || key}. Strum to play!`;
+      const trackTitle = songPlayer.trackFiles[key]?.title || key;
+      if (bgTrackStatus) bgTrackStatus.textContent = `Selected ${trackTitle}. Strum to play!`;
+      const badge = document.getElementById('flyingPostersActiveBadge');
+      if (badge) badge.textContent = `Track: ${trackTitle}`;
+      const trackKeys = ['pani_da_rang', 'mitti_di_khushboo', 'nazm_nazm', 'saadi_galli', 'acoustic_ballad'];
+      const idx = trackKeys.indexOf(key);
+      if (idx >= 0) {
+        if (trackOptionWheelInstance && trackOptionWheelInstance.selected !== idx) {
+          trackOptionWheelInstance.applyTarget(idx, true);
+        }
+        if (flyingPostersInstance) {
+          flyingPostersInstance.scrollToIndex(idx);
+        }
+      }
     }
 
     function toggleRockstarMode(val) {
@@ -4480,6 +5200,10 @@
     function initImmediateSetup() {
       initDomReferences();
       resizeFretboardCanvas();
+      initTrackOptionWheel();
+      initFlyingPosters();
+      initClickSpark();
+      initElasticSliders();
       if (songPlayer) songPlayer.setTrack('pani_da_rang');
       selectChord('Em', false);
     }

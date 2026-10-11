@@ -13,6 +13,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+  <!-- GSAP CDN for React Bits Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <!-- MediaPipe Hands CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js" crossorigin="anonymous"></script>
   <script>
@@ -1348,6 +1350,298 @@
     .option-wheel__item--selected {
       font-weight: 700;
     }
+
+  /* REACT BITS: BUBBLE MENU STYLES */
+.bubble-menu {
+  left: 0;
+  right: 0;
+  top: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 1.5em;
+  pointer-events: none;
+  z-index: 99;
+}
+
+.bubble-menu.fixed {
+  position: fixed;
+}
+
+.bubble-menu.absolute {
+  position: absolute;
+}
+
+.bubble-menu .bubble {
+  --bubble-size: 44px;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  border-radius: 50%;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.bubble-menu .logo-bubble,
+.bubble-menu .toggle-bubble {
+  will-change: transform;
+}
+
+.bubble-menu .logo-bubble {
+  width: auto;
+  min-height: var(--bubble-size);
+  height: var(--bubble-size);
+  padding: 0 16px;
+  border-radius: calc(var(--bubble-size) / 2);
+  gap: 8px;
+}
+
+.bubble-menu .toggle-bubble {
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+}
+
+.bubble-menu .bubble-logo {
+  max-height: 60%;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.bubble-menu .logo-content {
+  --logo-max-height: 60%;
+  --logo-max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 100%;
+  font-family: var(--font-sans, -apple-system, sans-serif);
+  font-weight: 700;
+  color: #f5f5f5;
+}
+
+.bubble-menu .logo-content > .bubble-logo,
+.bubble-menu .logo-content > img,
+.bubble-menu .logo-content > svg {
+  max-height: var(--logo-max-height);
+  max-width: var(--logo-max-width);
+}
+
+.bubble-menu .menu-btn {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #181818;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.bubble-menu .menu-btn:hover {
+  background: #242424;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.bubble-menu .menu-btn:active {
+  transform: scale(0.95);
+}
+
+.bubble-menu .menu-line {
+  width: 22px;
+  height: 2px;
+  background: #f5f5f5;
+  border-radius: 2px;
+  display: block;
+  margin: 0 auto;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+  transform-origin: center;
+}
+
+.bubble-menu .menu-line + .menu-line {
+  margin-top: 5px;
+}
+
+.bubble-menu .menu-btn.open .menu-line:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+.bubble-menu .menu-btn.open .menu-line:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+@media (min-width: 768px) {
+  .bubble-menu .bubble {
+    --bubble-size: 50px;
+  }
+
+  .bubble-menu .logo-bubble {
+    padding: 0 16px;
+  }
+}
+
+.bubble-menu-items {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 98;
+  background: rgba(10, 10, 10, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.bubble-menu-items.fixed {
+  position: fixed;
+}
+
+.bubble-menu-items.absolute {
+  position: absolute;
+}
+
+.bubble-menu-items .pill-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  row-gap: 8px;
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  pointer-events: auto;
+  justify-content: stretch;
+}
+
+.bubble-menu-items .pill-list .pill-spacer {
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+}
+
+.bubble-menu-items .pill-list .pill-col {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex: 0 0 calc(100% / 3);
+  box-sizing: border-box;
+}
+
+.bubble-menu-items .pill-list .pill-col:nth-child(4):nth-last-child(2) {
+  margin-left: calc(100% / 6);
+}
+
+.bubble-menu-items .pill-list .pill-col:nth-child(4):last-child {
+  margin-left: calc(100% / 3);
+}
+
+.bubble-menu-items .pill-link {
+  --pill-bg: #1c1c1c;
+  --pill-color: #f5f5f5;
+  --pill-border: rgba(255, 255, 255, 0.1);
+  --item-rot: 0deg;
+  --pill-min-h: 120px;
+  --hover-bg: #2a2a2a;
+  --hover-color: #ffffff;
+  width: 100%;
+  min-height: var(--pill-min-h);
+  padding: clamp(1.2rem, 2.5vw, 6rem) 0;
+  font-size: clamp(1.4rem, 3.2vw, 3rem);
+  font-family: var(--font-sans, -apple-system, sans-serif);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--pill-color);
+  border: 1px solid var(--pill-border);
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+  will-change: transform;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 10px;
+}
+
+@media (min-width: 900px) {
+  .bubble-menu-items .pill-link {
+    transform: rotate(var(--item-rot));
+  }
+
+  .bubble-menu-items .pill-link:hover {
+    transform: rotate(var(--item-rot)) scale(1.05);
+    background: var(--hover-bg);
+    color: var(--hover-color);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .bubble-menu-items .pill-link:active {
+    transform: rotate(var(--item-rot)) scale(0.95);
+  }
+}
+
+.bubble-menu-items .pill-link .pill-label {
+  display: inline-block;
+  will-change: transform, opacity;
+  height: 1.2em;
+  line-height: 1.2;
+}
+
+@media (max-width: 899px) {
+  .bubble-menu-items {
+    align-items: flex-start;
+    padding-top: 100px;
+  }
+
+  .bubble-menu-items .pill-list {
+    row-gap: 12px;
+  }
+
+  .bubble-menu-items .pill-list .pill-col {
+    flex: 0 0 100%;
+    margin-left: 0 !important;
+    overflow: visible;
+  }
+
+  .bubble-menu-items .pill-link {
+    font-size: clamp(1.2rem, 3vw, 2.5rem);
+    padding: clamp(1rem, 2vw, 2rem) 0;
+    min-height: 70px;
+  }
+
+  .bubble-menu-items .pill-link:hover {
+    transform: scale(1.04);
+    background: var(--hover-bg);
+    color: var(--hover-color);
+  }
+
+  .bubble-menu-items .pill-link:active {
+    transform: scale(0.95);
+  }
+}
+
   </style>
 </head>
 <body>
@@ -1385,8 +1679,47 @@
         </svg>
         <span>Fullscreen</span>
       </button>
+      <button type="button" id="bubbleMenuToggle" class="nav-pill-btn bubble-toggle-pill" onclick="toggleBubbleMenu()" aria-label="Toggle studio menu" aria-pressed="false" title="Open Studio Menu">
+        <span class="menu-icon-bars">
+          <span class="menu-line"></span>
+          <span class="menu-line short"></span>
+        </span>
+        <span>Menu</span>
+      </button>
     </div>
   </nav>
+
+  <!-- React Bits: BubbleMenu Overlay -->
+  <div id="bubbleMenuOverlay" class="bubble-menu-items fixed" aria-hidden="true" style="display: none;" onclick="closeBubbleMenuOnBackdrop(event)">
+    <ul class="pill-list" role="menu" aria-label="Studio menu links" onclick="event.stopPropagation()">
+      <li role="none" class="pill-col">
+        <a role="menuitem" href="#stageWrapper" class="pill-link" style="--item-rot: -8deg; --hover-bg: #d97706; --hover-color: #ffffff;" onclick="handleBubbleClick(event, '#stageWrapper')">
+          <span class="pill-label">Stage</span>
+        </a>
+      </li>
+      <li role="none" class="pill-col">
+        <a role="menuitem" href="#fretboardCard" class="pill-link" style="--item-rot: 8deg; --hover-bg: #10b981; --hover-color: #ffffff;" onclick="handleBubbleClick(event, '#fretboardCard')">
+          <span class="pill-label">Fretboard</span>
+        </a>
+      </li>
+      <li role="none" class="pill-col">
+        <a role="menuitem" href="#controlsPanel" class="pill-link" style="--item-rot: -6deg; --hover-bg: #f59e0b; --hover-color: #121212;" onclick="handleBubbleClick(event, '#controlsPanel')">
+          <span class="pill-label">Chord Pads</span>
+        </a>
+      </li>
+      <li role="none" class="pill-col">
+        <a role="menuitem" href="#bgSongCard" class="pill-link" style="--item-rot: 6deg; --hover-bg: #ef4444; --hover-color: #ffffff;" onclick="handleBubbleClick(event, '#bgSongCard')">
+          <span class="pill-label">Studio Mixer</span>
+        </a>
+      </li>
+      <li role="none" class="pill-col">
+        <a role="menuitem" href="#shortcuts" class="pill-link" style="--item-rot: -8deg; --hover-bg: #78350f; --hover-color: #ffffff;" onclick="handleBubbleClick(event, '#shortcuts')">
+          <span class="pill-label">Shortcuts</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
 
   <div class="main-container">
     <div class="stage-wrapper" id="stageWrapper">
@@ -1458,7 +1791,7 @@
     </div>
 
     <!-- BACKGROUND VOCALS & STUDIO MIXER DECK -->
-    <div class="bg-song-card">
+    <div class="bg-song-card" id="bgSongCard">
       <div class="bg-song-row">
         <!-- Studio Track Badge -->
         <div class="vinyl-widget">
@@ -1575,7 +1908,7 @@
     </div>
 
     <!-- INTERACTIVE REAL GUITAR FRETBOARD -->
-    <div class="fretboard-card">
+    <div class="fretboard-card" id="fretboardCard">
       <div class="fretboard-header">
         <div class="fretboard-title">
           <span>ACOUSTIC FRETBOARD · HARMONIC VOICING</span>
@@ -1606,7 +1939,7 @@
     </div>
 
     <!-- CHORD SELECTOR PANEL (MPC SILICONE PADS) -->
-    <div class="controls-panel">
+    <div class="controls-panel" id="controlsPanel">
       <div class="panel-header-row">
         <span class="panel-label">CHORD PADS · SILICONE MATRIX</span>
         <span style="font-size: 0.74rem; color: var(--text-muted); font-family: var(--font-mono);">Keys [1]–[9] to trigger · [Space] to strum</span>
@@ -1771,6 +2104,101 @@
     /* ==========================================================================
        REACT BITS: OPTION WHEEL ENGINE
        ========================================================================== */
+    /* ==========================================================================
+       REACT BITS: BUBBLE MENU CONTROLLER
+       ========================================================================== */
+    var isBubbleMenuOpen = false;
+
+    function toggleBubbleMenu() {
+      if (guitarAudio && guitarAudio.playUiClick) guitarAudio.playUiClick(1400);
+      isBubbleMenuOpen ? closeBubbleMenu() : openBubbleMenu();
+    }
+
+    function openBubbleMenu() {
+      isBubbleMenuOpen = true;
+      const overlay = document.getElementById('bubbleMenuOverlay');
+      const toggleBtn = document.getElementById('bubbleMenuToggle');
+      if (toggleBtn) {
+        toggleBtn.classList.add('open');
+        toggleBtn.setAttribute('aria-pressed', 'true');
+      }
+      if (!overlay) return;
+
+      overlay.style.display = 'flex';
+      overlay.setAttribute('aria-hidden', 'false');
+
+      const bubbles = overlay.querySelectorAll('.pill-link');
+      const labels = overlay.querySelectorAll('.pill-label');
+
+      if (typeof gsap !== 'undefined') {
+        gsap.killTweensOf([...bubbles, ...labels]);
+        gsap.set(bubbles, { scale: 0, transformOrigin: '50% 50%' });
+        gsap.set(labels, { y: 24, autoAlpha: 0 });
+
+        bubbles.forEach((bubble, i) => {
+          const delay = i * 0.08 + (Math.random() * 0.04 - 0.02);
+          const tl = gsap.timeline({ delay });
+          tl.to(bubble, { scale: 1, duration: 0.45, ease: 'back.out(1.5)' });
+          if (labels[i]) {
+            tl.to(labels[i], { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power3.out' }, '-=0.35');
+          }
+        });
+      } else {
+        bubbles.forEach(b => b.style.transform = 'scale(1)');
+        labels.forEach(l => { l.style.opacity = '1'; l.style.transform = 'translateY(0)'; });
+      }
+    }
+
+    function closeBubbleMenu() {
+      isBubbleMenuOpen = false;
+      const overlay = document.getElementById('bubbleMenuOverlay');
+      const toggleBtn = document.getElementById('bubbleMenuToggle');
+      if (toggleBtn) {
+        toggleBtn.classList.remove('open');
+        toggleBtn.setAttribute('aria-pressed', 'false');
+      }
+      if (!overlay) return;
+
+      const bubbles = overlay.querySelectorAll('.pill-link');
+      const labels = overlay.querySelectorAll('.pill-label');
+
+      if (typeof gsap !== 'undefined') {
+        gsap.killTweensOf([...bubbles, ...labels]);
+        gsap.to(labels, { y: 24, autoAlpha: 0, duration: 0.15, ease: 'power3.in' });
+        gsap.to(bubbles, {
+          scale: 0,
+          duration: 0.18,
+          ease: 'power3.in',
+          onComplete: () => {
+            overlay.style.display = 'none';
+            overlay.setAttribute('aria-hidden', 'true');
+          }
+        });
+      } else {
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function closeBubbleMenuOnBackdrop(e) {
+      if (e.target.id === 'bubbleMenuOverlay') {
+        closeBubbleMenu();
+      }
+    }
+
+    function handleBubbleClick(e, targetId) {
+      e.preventDefault();
+      closeBubbleMenu();
+      if (targetId === '#shortcuts') {
+        openShortcutsModal();
+      } else {
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+
     var trackOptionWheelInstance = null;
 
     class OptionWheel {

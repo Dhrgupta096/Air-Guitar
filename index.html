@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>🎸 Real Guitar Simulator — Interactive Chords & Fretboard</title>
+  <title>Strum Air — Acoustic Vision Studio</title>
 
   <!-- MediaPipe Hands CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js" crossorigin="anonymous"></script>
@@ -18,15 +18,15 @@
 
   <style>
     :root {
-      --bg: #07090e;
-      --card-bg: rgba(14, 18, 28, 0.78);
-      --card-bg-elevated: rgba(20, 26, 40, 0.92);
+      --bg: #07080b;
+      --card-bg: rgba(13, 16, 24, 0.78);
+      --card-bg-elevated: rgba(18, 22, 34, 0.92);
       --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.18);
-      --border-active: rgba(245, 158, 11, 0.45);
+      --border-hover: rgba(255, 255, 255, 0.16);
+      --border-active: rgba(245, 158, 11, 0.5);
       --gold: #f59e0b;
       --gold-hover: #fbbf24;
-      --gold-glow: rgba(245, 158, 11, 0.3);
+      --gold-glow: rgba(245, 158, 11, 0.25);
       --gold-subtle: rgba(245, 158, 11, 0.12);
       --fret-wood: #261c16;
       --fret-wood-dark: #150f0c;
@@ -43,12 +43,12 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Geist", "Segoe UI", sans-serif;
       user-select: none;
     }
 
     body {
-      background: radial-gradient(circle at 50% -10%, #171e33 0%, #090c14 55%, #05060a 100%);
+      background: radial-gradient(circle at 50% -10%, #151b2c 0%, #080a10 55%, #050608 100%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -67,7 +67,7 @@
       align-items: center;
       padding: 10px 18px;
       margin-bottom: 14px;
-      background: rgba(14, 18, 30, 0.65);
+      background: rgba(14, 17, 26, 0.7);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border);
@@ -81,18 +81,24 @@
       gap: 12px;
     }
 
-    .brand-icon {
-      font-size: 1.8rem;
-      filter: drop-shadow(0 0 12px var(--gold-glow));
+    .brand-logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
     }
 
     .brand-text-col h1 {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 70%, var(--gold) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -101,18 +107,18 @@
     .brand-badge {
       font-size: 0.62rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       background: var(--gold-subtle);
       border: 1px solid var(--border-active);
       color: var(--gold);
       padding: 2px 7px;
       border-radius: 6px;
       font-weight: 800;
-      -webkit-text-fill-color: var(--gold);
+      font-family: ui-monospace, monospace;
     }
 
     .brand-subtitle {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
       margin-top: 2px;
     }
@@ -245,8 +251,9 @@
     }
 
     .lyrics-tag::before {
-      content: '🎵';
-      font-size: 0.8rem;
+      content: '•';
+      color: var(--amber);
+      font-size: 0.9rem;
       font-style: normal;
     }
 
@@ -1231,15 +1238,27 @@
   <!-- Top Glass Navbar -->
   <nav class="top-navbar">
     <div class="brand-group">
-      <span class="brand-icon">🎸</span>
+      <div class="brand-logo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+      </div>
       <div class="brand-text-col">
-        <h1>STRUM AIR <span class="brand-badge">STUDIO V2</span></h1>
-        <div class="brand-subtitle">Natural Air Strumming · Real Acoustic Guitar & Vocal Backing Jam</div>
+        <h1>STRUM AIR <span class="brand-badge">PRO VISION</span></h1>
+        <div class="brand-subtitle">Natural Acoustic Hand Strumming · Real-time Vision Engine</div>
       </div>
     </div>
     <div class="nav-actions">
-      <button class="nav-pill-btn" onclick="openShortcutsModal()">⌨️ Shortcuts</button>
-      <button class="nav-pill-btn" onclick="toggleFullscreenStage()">⛶ Fullscreen</button>
+      <button class="nav-pill-btn" onclick="openShortcutsModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"></path></svg>
+        Shortcuts
+      </button>
+      <button class="nav-pill-btn" onclick="toggleFullscreenStage()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        Fullscreen
+      </button>
     </div>
   </nav>
 
@@ -1262,7 +1281,7 @@
         <!-- Center Velocity Gauge -->
         <div class="strum-velocity-center">
           <div class="velocity-hud-pill" id="hudVelocityPill">
-            <span class="velocity-label" id="hudVelocityLabel">🎸 STRUM TO JAM</span>
+            <span class="velocity-label" id="hudVelocityLabel">STRUM READY</span>
             <div class="velocity-bar-track">
               <div class="velocity-bar-fill" id="hudVelocityFill"></div>
             </div>
@@ -1272,11 +1291,11 @@
 
         <div class="metrics-hud">
           <div class="metric-card">
-            <div class="metric-title">Acting Strum</div>
-            <div class="metric-value" id="hudActingStatus" style="color: var(--gold);">Strum to Jam!</div>
+            <div class="metric-title">MOTION</div>
+            <div class="metric-value" id="hudActingStatus" style="color: var(--gold);">Ready to Strum</div>
           </div>
           <div class="metric-card">
-            <div class="metric-title">Total Strums</div>
+            <div class="metric-title">STRUMS</div>
             <div class="metric-value" id="hudTotalStrums">0</div>
           </div>
           <div class="metric-card" style="display: flex; align-items: center;">
@@ -1290,19 +1309,28 @@
 
       <!-- Stage Bottom Action Bar -->
       <div class="stage-bottom-bar">
-        <button class="stage-pill-btn" onclick="toggleCameraMirror()">🔄 <span id="mirrorBtnText">Mirror On</span></button>
-        <button class="stage-pill-btn" onclick="toggleMuteAudio()">🔊 <span id="muteBtnText">Sound On</span></button>
-        <button class="stage-pill-btn" onclick="toggleFullscreenStage()">⛶ Fullscreen</button>
+        <button class="stage-pill-btn" onclick="toggleCameraMirror()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+          <span id="mirrorBtnText">Mirror On</span>
+        </button>
+        <button class="stage-pill-btn" onclick="toggleMuteAudio()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          <span id="muteBtnText">Sound On</span>
+        </button>
+        <button class="stage-pill-btn" onclick="toggleFullscreenStage()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
+          Fullscreen
+        </button>
       </div>
 
       <!-- Start Overlay -->
       <div class="start-overlay" id="startOverlay">
-        <h2>Acoustic Studio Jam Ready</h2>
+        <h2>Acoustic Vision Studio</h2>
         <p>
-          Turn on your camera! Strum naturally in the air with your hands to trigger authentic acoustic steel strings while live vocal backing tracks play in harmony.
+          Real-time hand tracking converts mid-air strumming motions into authentic acoustic guitar chords layered seamlessly with backing audio.
         </p>
-        <button class="primary-btn" id="startBtn" onclick="initApp()">🎸 Start Camera & Jam</button>
-        <button class="secondary-btn" onclick="startMouseDemo()">🖱️ Test with Mouse / Touch Demo</button>
+        <button class="primary-btn" id="startBtn" onclick="initApp()">Launch Vision Camera</button>
+        <button class="secondary-btn" onclick="startMouseDemo()">Interactive Demo</button>
         <div id="initError" style="color: #ef4444; font-size: 0.88rem; margin-top: 12px; display: none;"></div>
       </div>
     </div>
@@ -1326,20 +1354,24 @@
 
         <div class="song-deck-header">
           <span class="song-title-label">
-            <span>🎤 Vocal & Guitar:</span>
+            <span>TRACK:</span>
             <select id="bgSongSelect" class="song-dropdown" onchange="changeTrack(this.value)">
-              <option value="pani_da_rang">🌟 Pani Da Rang (Acoustic Vocal + Guitar)</option>
-              <option value="mitti_di_khushboo">🌾 Mitti Di Khushboo (Acoustic Vocal + Guitar)</option>
-              <option value="nazm_nazm">✨ Nazm Nazm (Acoustic Vocal + Guitar)</option>
-              <option value="saadi_galli">🎬 Saadi Galli Aaja (Acoustic Vocal + Guitar)</option>
-              <option value="acoustic_ballad">🥁 Acoustic Jam Drum Beat (85 BPM)</option>
+              <option value="pani_da_rang">Pani Da Rang — Acoustic Vocal & Guitar</option>
+              <option value="mitti_di_khushboo">Mitti Di Khushboo — Acoustic Vocal & Guitar</option>
+              <option value="nazm_nazm">Nazm Nazm — Acoustic Vocal & Guitar</option>
+              <option value="saadi_galli">Saadi Galli Aaja — Acoustic Vocal & Guitar</option>
+              <option value="acoustic_ballad">Session Drum Beat — 85 BPM</option>
             </select>
           </span>
 
-          <button class="audio-btn primary" id="btnPlayBg" onclick="togglePlayBgSong()">▶️ Play Song</button>
+          <button class="audio-btn primary" id="btnPlayBg" onclick="togglePlayBgSong()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Play Track</span>
+          </button>
           
           <label class="audio-btn" style="cursor: pointer;">
-            📁 Load Any MP3
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <span>Import MP3</span>
             <input type="file" id="userAudioFile" accept="audio/*" style="display: none;" onchange="loadUserAudioFile(event)">
           </label>
         </div>
@@ -1348,16 +1380,16 @@
           <canvas id="audioVisualizer" width="140" height="24"></canvas>
         </div>
 
-        <label class="toggle-wrapper" title="When enabled, the song plays smoothly when you are strumming/acting in the air, and pauses if you stop!">
+        <label class="toggle-wrapper" title="When enabled, the song plays smoothly when you are strumming in the air, and pauses if you stop!">
           <input type="checkbox" id="rockstarModeToggle" class="toggle-checkbox" checked onchange="toggleRockstarMode(this.checked)">
           <div class="toggle-switch"></div>
-          <span style="font-size: 0.86rem; font-weight: 700; color: var(--gold);">Air Guitarist Mode</span>
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--gold); letter-spacing: 0.04em;">Motion Sync</span>
         </label>
       </div>
 
       <!-- Real-time Song Scrubber & Timeline -->
       <div class="song-timeline-wrap">
-        <span style="font-size: 0.76rem; font-weight: 700; color: var(--gold);">PROGRESS</span>
+        <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; color: var(--gold);">TIMELINE</span>
         <div class="song-timeline-bar" id="songTimelineBar" onclick="onTimelineClick(event)">
           <div class="song-timeline-fill" id="songTimelineFill"></div>
         </div>
@@ -1366,10 +1398,10 @@
 
       <div class="bg-song-row" style="font-size: 0.84rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px;">
         <div class="volume-slider-group">
-          <span class="vol-icon">🎤</span>
-          <span>Song / Vocal Vol:</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          <span>Vocal / Track:</span>
           <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="setBgVolume(this.value)">
-          <div class="vu-meter-ladder" id="bgVuLadder" title="Song Output VU Peak">
+          <div class="vu-meter-ladder" id="bgVuLadder" title="Track VU Meter">
             <div class="vu-led-seg"></div>
             <div class="vu-led-seg"></div>
             <div class="vu-led-seg"></div>
@@ -1382,10 +1414,10 @@
         </div>
 
         <div class="volume-slider-group">
-          <span class="vol-icon">🎸</span>
-          <span>Your Air Strum Vol:</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+          <span>Acoustic Strum:</span>
           <input type="range" id="strumVolumeSlider" min="0" max="1.5" step="0.05" value="1.0" oninput="setStrumVolume(this.value)">
-          <div class="vu-meter-ladder" id="strumVuLadder" title="Guitar Strum VU Peak">
+          <div class="vu-meter-ladder" id="strumVuLadder" title="Guitar Strum VU Meter">
             <div class="vu-led-seg"></div>
             <div class="vu-led-seg"></div>
             <div class="vu-led-seg"></div>
@@ -1397,7 +1429,7 @@
           </div>
         </div>
 
-        <span style="color: var(--text-muted); font-size: 0.82rem;" id="bgTrackStatus">Ready · Strum in the air to drive the music!</span>
+        <span style="color: var(--text-muted); font-size: 0.8rem; font-family: ui-monospace, monospace;" id="bgTrackStatus">Ready · Strum in frame to drive playback</span>
       </div>
     </div>
 
@@ -1405,7 +1437,7 @@
     <div class="fretboard-card">
       <div class="fretboard-header">
         <div class="fretboard-title">
-          <span>🎸 Interactive Rosewood Fretboard — Exact Finger Pressing Points</span>
+          <span>ROSEWOOD FRETBOARD · HARMONIC FINGERINGS</span>
         </div>
         <div class="fret-finger-legend">
           <div class="legend-item"><span class="finger-dot" style="background: var(--finger-1);">1</span> Index</div>
@@ -1422,12 +1454,12 @@
       </div>
 
       <div class="fretboard-hint-row">
-        <span style="color: var(--gold); font-size: 0.8rem;">💡 Tip: Click any string on the fretboard above to pluck that individual string note!</span>
-        <span style="color: var(--text-muted); font-size: 0.8rem;">Frets 1 – 4 · Standard EADGBe Tuning</span>
+        <span style="color: var(--gold); font-size: 0.78rem;">Note Audition: Click any string on the fretboard to pluck that individual note</span>
+        <span style="color: var(--text-muted); font-size: 0.78rem; font-family: ui-monospace, monospace;">Frets 1 – 4 · Standard EADGBe Tuning</span>
       </div>
 
       <div class="chord-instruction">
-        <span style="font-weight: 700; color: #ffffff;">Finger Placement Guide:</span>
+        <span style="font-weight: 700; color: #ffffff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Placement Guide:</span>
         <div class="finger-steps" id="hudFingerSteps"></div>
       </div>
     </div>
@@ -1435,8 +1467,8 @@
     <!-- CHORD SELECTOR PANEL (MPC PADS) -->
     <div class="controls-panel">
       <div class="panel-header-row">
-        <span class="panel-label">🎛️ Select Chord (MPC Pads)</span>
-        <span style="font-size: 0.8rem; color: var(--text-muted);">Press keys [1]–[9] to switch, [Space] to strum</span>
+        <span class="panel-label">CHORD MATRIX (HARDWARE PADS)</span>
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: ui-monospace, monospace;">Keys [1]–[9] to switch, [Space] to strum</span>
       </div>
 
       <div class="chord-grid">
@@ -1489,21 +1521,21 @@
 
       <!-- PRESET PROGRESSION QUICK CHIPS -->
       <div class="progression-chips-wrap">
-        <span class="prog-chip-label">⚡ Progressions:</span>
+        <span class="prog-chip-label">PRESETS:</span>
         <button class="prog-chip active" id="chip-pani" onclick="applyProgression('pani', ['Em', 'D', 'C', 'D'], this)">
-          <span>Pani Da Rang:</span> <strong>Em → D → C → D</strong>
+          <span>Pani Da Rang:</span> <strong>Em · D · C · D</strong>
         </button>
         <button class="prog-chip" id="chip-mitti" onclick="applyProgression('mitti', ['G', 'Em', 'C', 'D'], this)">
-          <span>Mitti Di Khushboo:</span> <strong>G → Em → C → D</strong>
+          <span>Mitti Di Khushboo:</span> <strong>G · Em · C · D</strong>
         </button>
         <button class="prog-chip" id="chip-nazm" onclick="applyProgression('nazm', ['C', 'G', 'Am', 'F'], this)">
-          <span>Nazm Nazm:</span> <strong>C → G → Am → F</strong>
+          <span>Nazm Nazm:</span> <strong>C · G · Am · F</strong>
         </button>
         <button class="prog-chip" id="chip-pop4" onclick="applyProgression('pop4', ['C', 'G', 'Am', 'F'], this)">
-          <span>Classic Pop:</span> <strong>C → G → Am → F</strong>
+          <span>Four Chords:</span> <strong>C · G · Am · F</strong>
         </button>
         <button class="prog-chip" id="chip-rock" onclick="applyProgression('rock', ['Em', 'G', 'D', 'A'], this)">
-          <span>Acoustic Rock:</span> <strong>Em → G → D → A</strong>
+          <span>Acoustic Rock:</span> <strong>Em · G · D · A</strong>
         </button>
       </div>
     </div>
@@ -1511,16 +1543,16 @@
     <!-- Quick Guide -->
     <div class="guide-cards">
       <div class="guide-card">
-        <strong>⚡ 1. Air Guitarist Mode (Acting on Guitar)</strong>
-        Act like you are playing the guitar! When you strum down or up in the air, the vocals and acoustic guitar play along in sync with your hand movement.
+        <strong>1. Hand Strum Tracking</strong>
+        Move your strumming hand down or up in camera frame to trigger acoustic steel strings with responsive velocity.
       </div>
       <div class="guide-card">
-        <strong>🎸 2. Real Vocals + Real Strums</strong>
-        The background audio plays authentic vocal tracks, while your hands strum real acoustic steel strings layered on top in perfect harmony.
+        <strong>2. Vocal & Guitar Harmony</strong>
+        Studio backing vocals and acoustic tracks synchronize dynamically with your strum dynamics and rhythm.
       </div>
       <div class="guide-card">
-        <strong>🖐️ 3. Exact Finger Placement</strong>
-        The interactive fretboard shows the exact strings and frets to press for each chord (`Em`, `D`, `C`, `G`, etc.) as the song progresses!
+        <strong>3. Exact Finger Placement</strong>
+        The rosewood fretboard visualizes the exact strings and frets to press for each harmonic voicing in real-time.
       </div>
     </div>
   </div>
@@ -1529,11 +1561,11 @@
   <div class="modal-overlay" id="shortcutsModal" onclick="closeShortcutsModal(event)">
     <div class="modal-dialog" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div class="modal-title">⌨️ Keyboard & Gesture Shortcuts</div>
+        <div class="modal-title">Keyboard & Vision Shortcuts</div>
         <button class="modal-close-btn" onclick="closeShortcutsModal()">×</button>
       </div>
       <div class="shortcut-row"><span>Select Chords (C, G, D, Em, Am, E, A, F, Dm)</span><span class="shortcut-key-badge">1 – 9</span></div>
-      <div class="shortcut-row"><span>Air Strum (Instant Trigger)</span><span class="shortcut-key-badge">Space</span></div>
+      <div class="shortcut-row"><span>Air Strum Trigger</span><span class="shortcut-key-badge">Space</span></div>
       <div class="shortcut-row"><span>Play / Pause Backing Track</span><span class="shortcut-key-badge">P</span></div>
       <div class="shortcut-row"><span>Mute Audio</span><span class="shortcut-key-badge">M</span></div>
       <div class="shortcut-row"><span>Toggle Fullscreen Stage</span><span class="shortcut-key-badge">F</span></div>
@@ -1903,6 +1935,8 @@
         if (vinylDisc) vinylDisc.classList.add('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "NOW PLAYING";
+        const playBtn = document.getElementById('btnPlayBg');
+        if (playBtn) playBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> <span>Pause Track</span>';
       }
 
       pause() {
@@ -1913,6 +1947,8 @@
         if (vinylDisc) vinylDisc.classList.remove('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "PAUSED";
+        const playBtn = document.getElementById('btnPlayBg');
+        if (playBtn) playBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> <span>Play Track</span>';
       }
     }
 
@@ -2292,15 +2328,15 @@
         console.error("Camera Init Error:", err);
         let userMsg = `Camera error (${err.name || "Error"}): ${err.message}`;
         if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-          userMsg = `🔒 Camera permission was blocked. Click the lock/tune icon in your Chrome address bar (left of http://localhost:8081) and set Camera to "Allow", then reload!`;
+          userMsg = `Camera permission was blocked. Check site permissions in your browser address bar and set Camera to "Allow", then reload.`;
         } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
-          userMsg = `📹 Your camera is currently in use by another tab or app (Zoom/FaceTime/another browser tab). Please close that app/tab and click Retry!`;
+          userMsg = `Camera is currently in use by another application or tab. Please release the camera and click Retry.`;
         } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-          userMsg = `📷 No webcam found. Click "Test with Mouse / Touch Demo" below to play immediately!`;
+          userMsg = `No webcam device detected. Select "Interactive Mouse & Touch Mode" below to play immediately.`;
         }
         initError.innerHTML = userMsg;
         initError.style.display = "block";
-        startBtn.textContent = "🔄 Retry Camera";
+        startBtn.textContent = "Retry Camera Connection";
       }
     }
 
@@ -2375,106 +2411,19 @@
       }
       ctx.restore();
 
-      // 1. Sci-Fi Viewfinder Corner Brackets & Crosshair HUD
-      ctx.save();
-      const cornerLen = 22;
-      const pad = 16;
-      ctx.strokeStyle = "rgba(245, 158, 11, 0.45)";
-      ctx.lineWidth = 2;
-
-      // Top-Left ⌜
-      ctx.beginPath();
-      ctx.moveTo(pad, pad + cornerLen);
-      ctx.lineTo(pad, pad);
-      ctx.lineTo(pad + cornerLen, pad);
-      ctx.stroke();
-
-      // Top-Right ⌝
-      ctx.beginPath();
-      ctx.moveTo(w - pad - cornerLen, pad);
-      ctx.lineTo(w - pad, pad);
-      ctx.lineTo(w - pad, pad + cornerLen);
-      ctx.stroke();
-
-      // Bottom-Left ⌞
-      ctx.beginPath();
-      ctx.moveTo(pad, h - pad - cornerLen);
-      ctx.lineTo(pad, h - pad);
-      ctx.lineTo(pad + cornerLen, h - pad);
-      ctx.stroke();
-
-      // Bottom-Right ⌟
-      ctx.beginPath();
-      ctx.moveTo(w - pad - cornerLen, h - pad);
-      ctx.lineTo(w - pad, h - pad);
-      ctx.lineTo(w - pad, h - pad - cornerLen);
-      ctx.stroke();
-
-      // Subtle Center Reticle (+)
-      const cx = w * 0.5;
-      const cy = h * 0.5;
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.16)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(cx - 14, cy); ctx.lineTo(cx - 4, cy);
-      ctx.moveTo(cx + 4, cy);  ctx.lineTo(cx + 14, cy);
-      ctx.moveTo(cx, cy - 14); ctx.lineTo(cx, cy - 4);
-      ctx.moveTo(cx, cy + 4);  ctx.lineTo(cx, cy + 14);
-      ctx.stroke();
-      ctx.restore();
-
-      // Subtle non-intrusive Air Strum Zone watermark (high-tech aesthetic)
-      ctx.save();
-      ctx.strokeStyle = "rgba(245, 158, 11, 0.16)";
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([6, 6]);
-      ctx.beginPath();
-      ctx.arc(w * 0.28, h * 0.58, h * 0.32, -0.6 * Math.PI, 0.6 * Math.PI);
-      ctx.stroke();
-      ctx.fillStyle = "rgba(245, 158, 11, 0.3)";
-      ctx.font = "bold 11px -apple-system, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("AIR STRUM ZONE ↕", w * 0.28, h * 0.28);
-      ctx.restore();
-
-      // 2. Dynamic Hand-Tracking Reticle Lock HUD
+      // Clean Minimalist Hand Presence Indicator
       if (trackedStrumX !== null && trackedStrumY !== null) {
         ctx.save();
-        const reticleTime = performance.now() * 0.003;
-        ctx.translate(trackedStrumX, trackedStrumY);
-
-        // Outer rotating dashed targeting ring
-        ctx.save();
-        ctx.rotate(reticleTime);
-        ctx.strokeStyle = "rgba(245, 158, 11, 0.65)";
-        ctx.lineWidth = 1.6;
-        ctx.setLineDash([8, 6]);
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.45)";
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
-        ctx.arc(0, 0, 24, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-
-        // Inner solid ring with cross tick marks
-        ctx.strokeStyle = "rgba(254, 240, 138, 0.85)";
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.arc(0, 0, 14, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // HUD Lock Tag
-        ctx.fillStyle = "rgba(15, 20, 34, 0.8)";
-        ctx.strokeStyle = "rgba(245, 158, 11, 0.6)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(18, -12, 112, 20, 5);
-        ctx.fill();
+        ctx.arc(trackedStrumX, trackedStrumY, 18, 0, Math.PI * 2);
         ctx.stroke();
 
         ctx.fillStyle = "#f59e0b";
-        ctx.font = "bold 9.5px -apple-system, monospace";
-        ctx.textAlign = "left";
-        ctx.fillText("🎸 STRUM TRACKER [LOCKED]", 24, 2);
-
+        ctx.beginPath();
+        ctx.arc(trackedStrumX, trackedStrumY, 2.5, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       }
 
@@ -2684,11 +2633,11 @@
 
       totalStrums++;
       if (hudTotalStrums) hudTotalStrums.textContent = totalStrums;
-      if (hudActingStatus) hudActingStatus.textContent = downstroke ? "⬇️ DOWNSTROKE" : "⬆️ UPSTROKE";
+      if (hudActingStatus) hudActingStatus.textContent = downstroke ? "DOWNSTROKE" : "UPSTROKE";
 
       // Update Center Velocity Gauge HUD
       if (hudVelocityLabel && hudVelocityFill && hudVelocityPct) {
-        hudVelocityLabel.textContent = downstroke ? "⬇️ DOWNSTROKE" : "⬆️ UPSTROKE";
+        hudVelocityLabel.textContent = downstroke ? "DOWNSTROKE" : "UPSTROKE";
         const pct = Math.min(100, Math.round(velocity * 75));
         hudVelocityFill.style.width = pct + "%";
         hudVelocityPct.textContent = pct + "%";
@@ -2706,8 +2655,8 @@
       if (rockstarAirMode) {
         if (!songPlayer.isPlaying) {
           songPlayer.play();
-          if (btnPlayBg) btnPlayBg.textContent = "⏸️ Pause Song";
-          if (bgTrackStatus) bgTrackStatus.textContent = "🔥 Vocals and guitar playing in sync with your strumming!";
+          if (btnPlayBg) btnPlayBg.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> <span>Pause Track</span>';
+          if (bgTrackStatus) bgTrackStatus.textContent = "Audio playing in sync with strumming";
         }
 
         // Advance song chords along the active progression
@@ -2725,9 +2674,9 @@
         rockstarPauseTimer = setTimeout(() => {
           if (rockstarAirMode && songPlayer.isPlaying) {
             songPlayer.pause();
-            if (btnPlayBg) btnPlayBg.textContent = "▶️ Play Song";
-            if (hudActingStatus) hudActingStatus.textContent = "Strum to Jam!";
-            if (bgTrackStatus) bgTrackStatus.textContent = "Paused · Strum in the air to resume the track!";
+            if (btnPlayBg) btnPlayBg.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> <span>Play Track</span>';
+            if (hudActingStatus) hudActingStatus.textContent = "Ready to Strum";
+            if (bgTrackStatus) bgTrackStatus.textContent = "Paused · Strum in frame to resume track";
           }
         }, 2000);
       }
@@ -2842,12 +2791,12 @@
       }
       if (songPlayer.isPlaying) {
         songPlayer.pause();
-        if (btnPlayBg) btnPlayBg.textContent = "▶️ Play Song";
+        if (btnPlayBg) btnPlayBg.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> <span>Play Track</span>';
         if (bgTrackStatus) bgTrackStatus.textContent = "Paused";
       } else {
         songPlayer.play();
-        if (btnPlayBg) btnPlayBg.textContent = "⏸️ Pause Song";
-        if (bgTrackStatus) bgTrackStatus.textContent = "Playing vocals & guitar...";
+        if (btnPlayBg) btnPlayBg.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> <span>Pause Track</span>';
+        if (bgTrackStatus) bgTrackStatus.textContent = "Playing session audio";
       }
     }
 
@@ -2892,7 +2841,7 @@
       songPlayer.audioEl.src = url;
       songPlayer.audioEl.play();
       songPlayer.isPlaying = true;
-      if (btnPlayBg) btnPlayBg.textContent = "⏸️ Pause Song";
+      if (btnPlayBg) btnPlayBg.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> <span>Pause Track</span>';
 
       const vinylDisc = document.getElementById('vinylDisc');
       if (vinylDisc) vinylDisc.classList.add('spinning');

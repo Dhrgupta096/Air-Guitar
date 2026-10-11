@@ -1440,6 +1440,47 @@
       border-color: rgba(245, 158, 11, 0.4);
     }
 
+    /* REACT BITS: CURVED LOOP STYLES */
+    .curved-loop-jacket {
+      position: relative;
+      width: 100%;
+      height: 44px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-y;
+      border-radius: 6px;
+      background: rgba(14, 14, 14, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .curved-loop-jacket.grabbing {
+      cursor: grabbing;
+    }
+
+    .curved-loop-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      display: block;
+      pointer-events: none;
+    }
+
+    .curved-loop-text {
+      font-size: 1.15rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      fill: var(--gold);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
   /* REACT BITS: BUBBLE MENU STYLES */
 .bubble-menu {
   left: 0;
@@ -1971,6 +2012,21 @@
 
 
   <div class="main-container">
+    <!-- React Bits: CurvedLoop Interactive Ribbon Marquee -->
+    <div class="curved-loop-jacket" id="curvedLoopJacket" title="Drag to fling marquee left or right">
+      <svg class="curved-loop-svg" viewBox="0 0 1440 90" id="curvedLoopSvg">
+        <text id="curvedMeasureText" xmlSpace="preserve" style="visibility: hidden; opacity: 0; pointer-events: none; font-size: 1.15rem; font-weight: 700; font-family: var(--font-mono);">
+          AIR GUITAR STUDIO ✦ OPTICAL HARMONIC TRACKING ✦ WEBAUDIO SYNTHESIS ✦ ZERO LATENCY ✦ 48 kHz ✦ REAL-TIME ACOUSTIC ENGINE ✦&nbsp;
+        </text>
+        <defs>
+          <path id="curvedLoopPath" d="M-100,28 Q720,86 1540,28" fill="none" stroke="transparent"></path>
+        </defs>
+        <text font-weight="700" xmlSpace="preserve" class="curved-loop-text">
+          <textPath id="curvedTextPath" href="#curvedLoopPath" startOffset="0px" xmlSpace="preserve"></textPath>
+        </text>
+      </svg>
+    </div>
+
     <div class="stage-wrapper" id="stageWrapper">
       <video id="webcam" playsinline autoplay muted></video>
       <canvas id="trackingCanvas"></canvas>
@@ -3922,6 +3978,129 @@ void main() {
       }
     }
 
+    /* ==========================================================================
+       REACT BITS: CURVED LOOP COMPONENT (INTERACTIVE CURVED RIBBON MARQUEE)
+       ========================================================================== */
+    var curvedLoopInstance = null;
+
+    class CurvedLoopDOM {
+      constructor(container, options = {}) {
+        this.container = container;
+        this.marqueeText = options.marqueeText || 'AIR GUITAR STUDIO ✦ OPTICAL HARMONIC TRACKING ✦ WEBAUDIO SYNTHESIS ✦ ZERO LATENCY ✦ 48 kHz ✦ REAL-TIME ACOUSTIC ENGINE ✦';
+        this.speed = options.speed !== undefined ? options.speed : 1.8;
+        this.curveAmount = options.curveAmount !== undefined ? options.curveAmount : 55;
+        this.direction = options.direction || 'left';
+        this.interactive = options.interactive !== undefined ? options.interactive : true;
+
+        this.text = (/\s|\u00A0$/.test(this.marqueeText) ? this.marqueeText.replace(/\s+$/, '') : this.marqueeText) + '\u00A0';
+        this.measureEl = container.querySelector('#curvedMeasureText');
+        this.textPathEl = container.querySelector('#curvedTextPath');
+        this.pathEl = container.querySelector('#curvedLoopPath');
+
+        this.spacing = 0;
+        this.offset = 0;
+        this.drag = false;
+        this.lastX = 0;
+        this.dir = this.direction;
+        this.vel = 0;
+        this.raf = null;
+
+        this.init();
+      }
+
+      init() {
+        if (!this.measureEl || !this.textPathEl || !this.pathEl) return;
+        this.measureEl.textContent = this.text;
+
+        try {
+          this.spacing = this.measureEl.getComputedTextLength() || 680;
+        } catch (e) {
+          this.spacing = 680;
+        }
+
+        const count = Math.ceil(2400 / Math.max(1, this.spacing)) + 2;
+        const totalText = Array(count).fill(this.text).join('');
+        this.textPathEl.textContent = totalText;
+
+        const initial = -this.spacing;
+        this.textPathEl.setAttribute('startOffset', initial + 'px');
+        this.offset = initial;
+
+        if (this.interactive) {
+          this.bindEvents();
+        }
+
+        this.startLoop();
+      }
+
+      startLoop() {
+        if (this.raf) cancelAnimationFrame(this.raf);
+        const step = () => {
+          if (!this.drag && this.textPathEl && this.spacing > 0) {
+            const delta = this.dir === 'right' ? this.speed : -this.speed;
+            let newOffset = this.offset + delta;
+            const wrapPoint = this.spacing;
+            if (newOffset <= -wrapPoint) newOffset += wrapPoint;
+            if (newOffset > 0) newOffset -= wrapPoint;
+            this.textPathEl.setAttribute('startOffset', newOffset + 'px');
+            this.offset = newOffset;
+          }
+          this.raf = requestAnimationFrame(step);
+        };
+        this.raf = requestAnimationFrame(step);
+      }
+
+      bindEvents() {
+        const el = this.container;
+        el.addEventListener('pointerdown', e => {
+          this.drag = true;
+          this.lastX = e.clientX;
+          this.vel = 0;
+          el.classList.add('grabbing');
+          el.setPointerCapture?.(e.pointerId);
+        });
+
+        el.addEventListener('pointermove', e => {
+          if (!this.drag || !this.textPathEl || !this.spacing) return;
+          const dx = e.clientX - this.lastX;
+          this.lastX = e.clientX;
+          this.vel = dx;
+
+          let newOffset = this.offset + dx;
+          const wrapPoint = this.spacing;
+          if (newOffset <= -wrapPoint) newOffset += wrapPoint;
+          if (newOffset > 0) newOffset -= wrapPoint;
+
+          this.textPathEl.setAttribute('startOffset', newOffset + 'px');
+          this.offset = newOffset;
+        });
+
+        const onEnd = () => {
+          if (!this.drag) return;
+          this.drag = false;
+          el.classList.remove('grabbing');
+          if (Math.abs(this.vel) > 0.5) {
+            this.dir = this.vel > 0 ? 'right' : 'left';
+          }
+        };
+
+        el.addEventListener('pointerup', onEnd);
+        el.addEventListener('pointercancel', onEnd);
+      }
+    }
+
+    function initCurvedLoop() {
+      const jacket = document.getElementById('curvedLoopJacket');
+      if (!jacket) return;
+      curvedLoopInstance = new CurvedLoopDOM(jacket, {
+        marqueeText: 'AIR GUITAR STUDIO ✦ OPTICAL HARMONIC TRACKING ✦ WEBAUDIO SYNTHESIS ✦ ZERO LATENCY ✦ 48 kHz ✦ REAL-TIME ACOUSTIC ENGINE ✦',
+        speed: 1.8,
+        curveAmount: 58,
+        direction: 'left',
+        interactive: true
+      });
+    }
+
     function initDomReferences() {
       webcamElement = document.getElementById('webcam');
       canvas = document.getElementById('trackingCanvas');
@@ -5200,6 +5379,7 @@ void main() {
     function initImmediateSetup() {
       initDomReferences();
       resizeFretboardCanvas();
+      initCurvedLoop();
       initTrackOptionWheel();
       initFlyingPosters();
       initClickSpark();

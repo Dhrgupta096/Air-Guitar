@@ -7,7 +7,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
  * Emits radial animated spark lines from any click position.
  */
 const ClickSpark = ({
-  sparkColor = '#f59e0b',
+  sparkColor = '#ffffff',
   sparkSize = 10,
   sparkRadius = 18,
   sparkCount = 8,

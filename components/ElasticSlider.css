@@ -55,7 +55,7 @@
 .slider-range {
   position: absolute;
   height: 100%;
-  background-color: #f59e0b;
+  background-color: #ffffff;
   border-radius: 9999px;
   transition: background-color 0.15s ease;
 }

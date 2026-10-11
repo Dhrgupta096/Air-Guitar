@@ -130,7 +130,7 @@ void main() {
  * Vintage CRT monitor phosphor shader with scanlines, barrel curvature, and plasma displacement.
  */
 export default function CRTWarp({
-  color = '#f59e0b',
+  color = '#e4e4e7',
   backgroundColor = '#080808',
   speed = 0.5,
   curvature = 0.25,

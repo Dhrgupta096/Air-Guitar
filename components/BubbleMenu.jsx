@@ -11,7 +11,7 @@ const DEFAULT_ITEMS = [
     href: '#stageWrapper',
     ariaLabel: 'Performance Stage',
     rotation: -8,
-    hoverStyles: { bgColor: '#d97706', textColor: '#ffffff' }
+    hoverStyles: { bgColor: '#e11d48', textColor: '#ffffff' }
   },
   {
     label: 'Fretboard',
@@ -25,7 +25,7 @@ const DEFAULT_ITEMS = [
     href: '#chordGrid',
     ariaLabel: 'Silicone MPC Chord Pads',
     rotation: -6,
-    hoverStyles: { bgColor: '#f59e0b', textColor: '#121212' }
+    hoverStyles: { bgColor: '#a855f7', textColor: '#ffffff' }
   },
   {
     label: 'Studio Mixer',

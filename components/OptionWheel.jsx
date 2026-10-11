@@ -18,7 +18,7 @@ const OptionWheel = ({
   defaultSelected = 0,
   onChange,
   textColor = '#737373',
-  activeColor = '#f59e0b',
+  activeColor = '#ffffff',
   side = 'left',
   fontSize = 1.25,
   spacing = 1.4,

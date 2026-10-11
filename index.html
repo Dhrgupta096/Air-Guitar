@@ -35,15 +35,15 @@
       --border: rgba(255, 255, 255, 0.08);
       --border-subtle: rgba(255, 255, 255, 0.04);
       --border-hover: rgba(255, 255, 255, 0.16);
-      --border-active: #d97706;
-      --gold: #d97706;
-      --gold-hover: #f59e0b;
-      --gold-subtle: rgba(217, 119, 6, 0.12);
+      --border-active: rgba(255, 255, 255, 0.4);
+      --gold: #ffffff;
+      --gold-hover: #e4e4e7;
+      --gold-subtle: rgba(255, 255, 255, 0.1);
       --fret-wood: #221712;
       --fret-wood-dark: #150f0c;
       --finger-1: #e5e5e5;
       --finger-2: #10b981;
-      --finger-3: #f59e0b;
+      --finger-3: #a855f7;
       --finger-4: #ef4444;
       --text: #f5f5f5;
       --text-muted: #888888;
@@ -509,7 +509,7 @@
 
     .primary-btn:hover {
       background: var(--gold-hover);
-      border-color: #fde68a;
+      border-color: #ffffff;
     }
 
     .primary-btn:active {
@@ -683,7 +683,7 @@
 
     .audio-btn.primary:hover {
       background: var(--gold-hover);
-      border-color: #fde68a;
+      border-color: #ffffff;
     }
 
     .audio-btn:active {
@@ -733,8 +733,8 @@
       background: #22c55e;
     }
 
-    .vu-led-seg.lit-yellow {
-      background: #eab308;
+    .vu-led-seg.lit-orange {
+      background: #ea580c;
     }
 
     .vu-led-seg.lit-red {
@@ -1075,10 +1075,10 @@
     }
 
     .chord-pad.active {
-      background: #241c14;
-      border: 1px solid #f59e0b;
-      border-bottom: 2px solid #b45309;
-      color: #f59e0b;
+      background: #222222;
+      border: 1px solid #ffffff;
+      border-bottom: 2px solid #a1a1aa;
+      color: #ffffff;
       transform: translateY(0);
     }
 
@@ -1108,8 +1108,8 @@
     }
 
     .chord-pad.active .chord-pad-keynum {
-      opacity: 0.85;
-      color: #f59e0b;
+      opacity: 0.9;
+      color: #ffffff;
     }
 
     /* PRESETS QUICK CHIPS */
@@ -1312,7 +1312,7 @@
 
     .option-wheel-viewport {
       --ow-text-color: #737373;
-      --ow-active-color: #f59e0b;
+      --ow-active-color: #ffffff;
       --ow-font-size: 1.15rem;
       --ow-inset: 20px;
 
@@ -1410,10 +1410,10 @@
       font-family: var(--font-mono);
       font-weight: 700;
       color: var(--gold);
-      background: rgba(20, 16, 12, 0.88);
+      background: rgba(24, 24, 27, 0.9);
       padding: 3px 10px;
       border-radius: 4px;
-      border: 1px solid rgba(245, 158, 11, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .posters-view-toggle-btn {
@@ -1436,9 +1436,9 @@
     }
 
     .posters-view-toggle-btn.active {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--gold);
-      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.45);
     }
 
     /* REACT BITS: CURVED LOOP STYLES */
@@ -1477,7 +1477,7 @@
       font-family: var(--font-mono);
       font-weight: 700;
       letter-spacing: 0.12em;
-      fill: var(--gold);
+      fill: #ffffff;
       text-transform: uppercase;
       line-height: 1;
     }
@@ -1521,7 +1521,7 @@
       font-family: var(--font-mono);
       font-weight: 700;
       letter-spacing: 0.08em;
-      color: var(--gold);
+      color: #a1a1aa;
       margin-top: 6px;
       text-transform: uppercase;
     }
@@ -1955,7 +1955,7 @@
 .slider-range {
   position: absolute;
   height: 100%;
-  background-color: #f59e0b;
+  background-color: #ffffff;
   border-radius: 9999px;
   transition: background-color 0.15s ease;
 }
@@ -2028,7 +2028,7 @@
   <div id="bubbleMenuOverlay" class="bubble-menu-items fixed" aria-hidden="true" style="display: none;" onclick="closeBubbleMenuOnBackdrop(event)">
     <ul class="pill-list" role="menu" aria-label="Studio menu links" onclick="event.stopPropagation()">
       <li role="none" class="pill-col">
-        <a role="menuitem" href="#stageWrapper" class="pill-link" style="--item-rot: -8deg; --hover-bg: #d97706; --hover-color: #ffffff;" onclick="handleBubbleClick(event, '#stageWrapper')">
+        <a role="menuitem" href="#stageWrapper" class="pill-link" style="--item-rot: -8deg; --hover-bg: #e11d48; --hover-color: #ffffff;" onclick="handleBubbleClick(event, '#stageWrapper')">
           <span class="pill-label">Stage</span>
         </a>
       </li>
@@ -2038,7 +2038,7 @@
         </a>
       </li>
       <li role="none" class="pill-col">
-        <a role="menuitem" href="#controlsPanel" class="pill-link" style="--item-rot: -6deg; --hover-bg: #f59e0b; --hover-color: #121212;" onclick="handleBubbleClick(event, '#controlsPanel')">
+        <a role="menuitem" href="#controlsPanel" class="pill-link" style="--item-rot: -6deg; --hover-bg: #a855f7; --hover-color: #ffffff;" onclick="handleBubbleClick(event, '#controlsPanel')">
           <span class="pill-label">Chord Pads</span>
         </a>
       </li>
@@ -2802,7 +2802,7 @@
         uniforms: {
           uResolution: { value: new THREE.Vector2(container.clientWidth || 640, container.clientHeight || 360) },
           uTime: { value: 0 },
-          uColor: { value: new THREE.Color('#f59e0b') },
+          uColor: { value: new THREE.Color('#e4e4e7') },
           uBackgroundColor: { value: new THREE.Color('#080808') },
           uCurvature: { value: 0.22 },
           uScanlineStrength: { value: 0.28 },
@@ -2903,7 +2903,7 @@
       }, { passive: true });
     }
 
-    function triggerClickSpark(x, y, color = '#f59e0b', count = 8, radius = 20, size = 11, duration = 380) {
+    function triggerClickSpark(x, y, color = '#ffffff', count = 8, radius = 20, size = 11, duration = 380) {
       const now = performance.now();
       for (let i = 0; i < count; i++) {
         clickSparks.push({
@@ -3062,9 +3062,9 @@
         const pulse = 0.8 + Math.sin(p.t * 3) * 0.2;
         const rad = Math.max(1, particleSize * scaleFactor * pulse);
 
-        // Warm acoustic amber particle rendering with capsule orientation
+        // Crisp studio optical particle rendering with capsule orientation
         const inRing = dist < magnetRadius;
-        ctx.fillStyle = inRing ? "#f59e0b" : "rgba(217, 119, 6, 0.4)";
+        ctx.fillStyle = inRing ? "#ffffff" : "rgba(255, 255, 255, 0.35)";
         ctx.beginPath();
         ctx.arc(p.cx, p.cy, rad, 0, Math.PI * 2);
         ctx.fill();
@@ -3176,7 +3176,7 @@
         this.defaultSelected = options.defaultSelected || 0;
         this.onChange = options.onChange;
         this.textColor = options.textColor || '#737373';
-        this.activeColor = options.activeColor || '#f59e0b';
+        this.activeColor = options.activeColor || '#ffffff';
         this.side = options.side || 'left';
         this.fontSize = options.fontSize || 1.15;
         this.spacing = options.spacing || 1.45;
@@ -3407,7 +3407,7 @@
         items: trackLabels,
         defaultSelected: 0,
         textColor: '#737373',
-        activeColor: '#f59e0b',
+        activeColor: '#ffffff',
         side: 'left',
         fontSize: 1.15,
         spacing: 1.45,
@@ -3715,11 +3715,11 @@ void main() {
           ctx.beginPath();
           ctx.arc(size / 2, size / 2, 70, 0, Math.PI * 2);
           ctx.fill();
-          ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
           ctx.lineWidth = 2;
           ctx.stroke();
 
-          ctx.fillStyle = '#f59e0b';
+          ctx.fillStyle = '#ffffff';
           ctx.beginPath();
           ctx.arc(size / 2, size / 2, 10, 0, Math.PI * 2);
           ctx.fill();
@@ -3737,7 +3737,7 @@ void main() {
           ctx.font = '700 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
           ctx.fillText(item.title || 'AIR GUITAR TRACK', size / 2, size / 2 - 16);
 
-          ctx.fillStyle = '#f59e0b';
+          ctx.fillStyle = '#e4e4e7';
           ctx.font = '700 14px "JetBrains Mono", monospace';
           ctx.fillText(item.sub || 'ACOUSTIC SESSION', size / 2, size / 2 + 10);
 
@@ -3973,7 +3973,7 @@ void main() {
           ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
           ctx.fillStyle = '#171717';
           ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-          ctx.fillStyle = '#f59e0b';
+          ctx.fillStyle = '#ffffff';
           ctx.font = '14px monospace';
           ctx.fillText('3D Flying Posters Active', 20, 30);
         };
@@ -4696,7 +4696,7 @@ void main() {
        4. INTERACTIVE FRETBOARD CANVAS RENDERER
        ========================================================================== */
     const STRING_NAMES = ['6 (E)', '5 (A)', '4 (D)', '3 (G)', '2 (B)', '1 (e)'];
-    const FINGER_COLORS = { 1: '#e5e5e5', 2: '#10b981', 3: '#f59e0b', 4: '#ef4444' };
+    const FINGER_COLORS = { 1: '#e5e5e5', 2: '#10b981', 3: '#a855f7', 4: '#ef4444' };
 
     function resizeFretboardCanvas() {
       if (!fCanvas || !fCtx) return;
@@ -4807,18 +4807,11 @@ void main() {
         fCtx.fillStyle = "rgba(0, 0, 0, 0.45)";
         fCtx.fillRect(leftMargin, sy + vib + 1.2, w - leftMargin - rightMargin, stringGauges[s]);
 
-        // Metallic string body
-        const isBronze = s < 3;
+        // Precision nickel & steel wound strings (clean metallic hardware)
         const strGrad = fCtx.createLinearGradient(0, sy + vib - stringGauges[s], 0, sy + vib + stringGauges[s]);
-        if (isBronze) {
-          strGrad.addColorStop(0, "#fde68a");
-          strGrad.addColorStop(0.5, "#d97706");
-          strGrad.addColorStop(1, "#78350f");
-        } else {
-          strGrad.addColorStop(0, "#ffffff");
-          strGrad.addColorStop(0.5, "#a3a3a3");
-          strGrad.addColorStop(1, "#525252");
-        }
+        strGrad.addColorStop(0, "#ffffff");
+        strGrad.addColorStop(0.5, "#d4d4d8");
+        strGrad.addColorStop(1, "#52525b");
         fCtx.fillStyle = strGrad;
         fCtx.fillRect(leftMargin, sy + vib - stringGauges[s] * 0.5, w - leftMargin - rightMargin, stringGauges[s]);
       }
@@ -4828,7 +4821,7 @@ void main() {
         const fx = leftMargin + (f.fret - 0.5) * fretWidth;
         const vib = (stringVibrations[f.string] || 0) * Math.sin(performance.now() * 0.06 + f.string) * 3.5;
         const fy = topMargin + f.string * stringSpacing + vib;
-        const color = FINGER_COLORS[f.finger] || '#f59e0b';
+        const color = FINGER_COLORS[f.finger] || '#a855f7';
 
         fCtx.save();
         fCtx.fillStyle = color;
@@ -5055,13 +5048,13 @@ void main() {
       // Clean Minimalist Hand Presence Indicator
       if (trackedStrumX !== null && trackedStrumY !== null) {
         ctx.save();
-        ctx.strokeStyle = "rgba(245, 158, 11, 0.45)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.arc(trackedStrumX, trackedStrumY, 18, 0, Math.PI * 2);
         ctx.stroke();
 
-        ctx.fillStyle = "#f59e0b";
+        ctx.fillStyle = "#ffffff";
         ctx.beginPath();
         ctx.arc(trackedStrumX, trackedStrumY, 2.5, 0, Math.PI * 2);
         ctx.fill();
@@ -5146,12 +5139,12 @@ void main() {
           const bx = startX + b * (barWidth + barGap);
           const by = vh - barH;
 
-          // Warm amber studio LED bar
-          visCtx.fillStyle = "#d97706";
+          // Pure studio nickel LED bar
+          visCtx.fillStyle = "#ffffff";
           visCtx.fillRect(bx, by, barWidth, barH);
 
           // Precision peak hold cap
-          visCtx.fillStyle = "#fde68a";
+          visCtx.fillStyle = "#d4d4d8";
           visCtx.fillRect(bx, Math.max(0, by - 2), barWidth, 1.5);
         }
       }
@@ -5271,7 +5264,7 @@ void main() {
           life: 0.8,
           decay: Math.random() * 0.04 + 0.03,
           size: Math.random() * 2.0 + 1.5,
-          color: "#f59e0b"
+          color: "#ffffff"
         });
       }
 
@@ -5342,7 +5335,7 @@ void main() {
         led.className = 'vu-led-seg';
         if (i < bgSegments) {
           if (i < 5) led.classList.add('lit-green');
-          else if (i < 7) led.classList.add('lit-yellow');
+          else if (i < 7) led.classList.add('lit-orange');
           else led.classList.add('lit-red');
         }
       });
@@ -5352,7 +5345,7 @@ void main() {
         led.className = 'vu-led-seg';
         if (i < strumSegments) {
           if (i < 5) led.classList.add('lit-green');
-          else if (i < 7) led.classList.add('lit-yellow');
+          else if (i < 7) led.classList.add('lit-orange');
           else led.classList.add('lit-red');
         }
       });

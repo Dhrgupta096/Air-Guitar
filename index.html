@@ -15,6 +15,8 @@
 
   <!-- GSAP CDN for React Bits Animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- Three.js CDN for React Bits 3D Shaders -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- MediaPipe Hands CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js" crossorigin="anonymous"></script>
   <script>
@@ -1642,6 +1644,23 @@
   }
 }
 
+
+  /* REACT BITS: CRT WARP STYLES */
+.crt-warp-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #080808;
+  border-radius: 8px;
+}
+
+.crt-warp-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
   </style>
 </head>
 <body>
@@ -1726,6 +1745,7 @@
       <video id="webcam" playsinline autoplay muted></video>
       <canvas id="trackingCanvas"></canvas>
 
+      <div id="crtWarpOverlay" class="crt-warp-container" style="position: absolute; inset: 0; pointer-events: none; z-index: 5; display: none; opacity: 0.82; mix-blend-mode: screen;"></div>
       <!-- Live Heads-Up Display -->
       <div class="hud-overlay">
         <div class="chord-card">
@@ -1769,6 +1789,10 @@
         <button class="stage-pill-btn" onclick="toggleMuteAudio()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
           <span id="muteBtnText">Sound On</span>
+        </button>
+        <button class="stage-pill-btn" id="crtWarpBtn" onclick="toggleCRTWarp()" title="Toggle React Bits Vintage CRT Monitor Shader">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          <span id="crtBtnText">CRT: Off</span>
         </button>
         <button class="stage-pill-btn" id="antigravityToggleBtn" onclick="toggleAntigravityField()" title="Toggle React Bits 3D Antigravity Particle Field">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line></svg>
@@ -2108,6 +2132,200 @@
     /* ==========================================================================
        REACT BITS: OPTION WHEEL ENGINE
        ========================================================================== */
+    /* ==========================================================================
+       REACT BITS: CRT WARP SHADER CONTROLLER
+       ========================================================================== */
+    var isCRTWarpActive = false;
+    var crtRenderer = null;
+    var crtScene = null;
+    var crtCamera = null;
+    var crtMaterial = null;
+    var crtMesh = null;
+    var crtClock = null;
+    var crtRaf = null;
+
+    const crtVertexShader = `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }
+    `;
+
+    const crtFragmentShader = `
+      precision highp float;
+      varying vec2 vUv;
+      uniform vec2 uResolution;
+      uniform float uTime;
+      uniform vec3 uColor;
+      uniform vec3 uBackgroundColor;
+      uniform float uCurvature;
+      uniform float uScanlineStrength;
+      uniform float uScanlineFrequency;
+      uniform float uWaveAmplitude;
+      uniform float uWaveFrequency;
+      uniform float uBloom;
+      uniform float uBloomRadius;
+      uniform float uNoise;
+      uniform float uVignette;
+      uniform float uBrightness;
+      uniform float uPixelation;
+      uniform float uRgbShift;
+      uniform vec2 uPointer;
+      uniform float uMouseStrength;
+      uniform float uMouseReact;
+
+      float hash21(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
+
+      vec2 crtCurve(vec2 uv, float radius) {
+        vec2 p = (uv - 0.5) * 2.0;
+        float safeRadius = max(radius, 1.415);
+        float cornerScale = safeRadius / sqrt(max(safeRadius * safeRadius - 2.0, 0.001));
+        p = safeRadius * p / sqrt(max(safeRadius * safeRadius - dot(p, p), 0.001));
+        p /= cornerScale;
+        return p * 0.5 + 0.5;
+      }
+
+      float referencePlasma(vec2 uv, float t) {
+        float frequencyScale = max(uWaveFrequency / 2.2, 0.001);
+        uv = (uv - 0.5) * frequencyScale + 0.5;
+        float scanline = 0.5 - 0.5 * cos(uv.y * 3.14159265 * uScanlineFrequency);
+        scanline = mix(1.0, scanline, uScanlineStrength);
+        uv *= vec2(80.0, 24.0);
+        uv = ceil(uv);
+        uv /= vec2(80.0, 24.0);
+        float amplitude = uWaveAmplitude / 0.28;
+        float field = 0.0;
+        field += 0.7 * sin(0.5 * uv.x + t / 5.0);
+        field += 3.0 * sin(1.6 * uv.y + t / 5.0);
+        field += sin(10.0 * (uv.y * sin(t / 2.0) + uv.x * cos(t / 5.0)) + t / 2.0);
+        float cx = uv.x + 0.5 * sin(t / 2.0);
+        float cy = uv.y + 0.5 * cos(t / 4.0);
+        field += 0.4 * sin(sqrt(100.0 * cx * cx + 100.0 * cy * cy + 1.0) + t);
+        field += 0.9 * sin(sqrt(75.0 * cx * cx + 25.0 * cy * cy + 1.0) + t);
+        field -= 1.4 * sin(sqrt(256.0 * cx * cx + 25.0 * cy * cy + 1.0) + t);
+        field += 0.3 * sin(0.5 * uv.y + uv.x + sin(t));
+        return scanline * floor(3.0 * (0.5 + 0.499 * sin(field * amplitude))) / 3.0;
+      }
+
+      void main() {
+        vec2 uv = vUv;
+        float curveRadius = 1.1 + 0.42 / max(uCurvature, 0.001);
+        vec2 curvedUv = crtCurve(uv, curveRadius);
+        float signal = referencePlasma(curvedUv, uTime);
+        float radius = 0.01 * uBloomRadius;
+        float glow = signal * 0.2;
+        glow += referencePlasma(curvedUv + vec2(radius, 0.0), uTime) * 0.12;
+        glow += referencePlasma(curvedUv - vec2(radius, 0.0), uTime) * 0.12;
+
+        float redSignal = referencePlasma(curvedUv + vec2(uRgbShift, 0.0), uTime);
+        float amberSignal = referencePlasma(curvedUv - vec2(uRgbShift, 0.0), uTime);
+        vec3 channelSignal = vec3(redSignal, signal, amberSignal);
+        vec3 waveColor = uColor * (0.3 + signal * 0.7 + glow * uBloom * 0.65);
+        waveColor += (channelSignal - signal) * 0.35;
+
+        float edge = clamp(1.0 - dot(vUv - 0.5, vUv - 0.5) * 2.0, 0.0, 1.0);
+        float waveMask = clamp(signal * 0.82 + glow * 0.52, 0.0, 1.0) * edge;
+        float grain = hash21(gl_FragCoord.xy + vec2(fract(uTime) * 173.0));
+        waveColor = max(waveColor * uBrightness, vec3(0.0));
+        vec3 color = mix(uBackgroundColor, waveColor, waveMask);
+        color += (grain - 0.5) * uNoise;
+        gl_FragColor = vec4(max(color, vec3(0.0)), 1.0);
+      }
+    `;
+
+    function initCRTWarp() {
+      const container = document.getElementById('crtWarpOverlay');
+      if (!container || typeof THREE === 'undefined') return;
+
+      crtScene = new THREE.Scene();
+      crtCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      const geometry = new THREE.PlaneGeometry(2, 2);
+
+      crtMaterial = new THREE.ShaderMaterial({
+        vertexShader: crtVertexShader,
+        fragmentShader: crtFragmentShader,
+        uniforms: {
+          uResolution: { value: new THREE.Vector2(container.clientWidth || 640, container.clientHeight || 360) },
+          uTime: { value: 0 },
+          uColor: { value: new THREE.Color('#f59e0b') },
+          uBackgroundColor: { value: new THREE.Color('#080808') },
+          uCurvature: { value: 0.22 },
+          uScanlineStrength: { value: 0.28 },
+          uScanlineFrequency: { value: 200.0 },
+          uWaveAmplitude: { value: 0.25 },
+          uWaveFrequency: { value: 2.2 },
+          uBloom: { value: 1.4 },
+          uBloomRadius: { value: 1.0 },
+          uNoise: { value: 0.08 },
+          uVignette: { value: 0.2 },
+          uBrightness: { value: 1.2 },
+          uPixelation: { value: 1.0 },
+          uRgbShift: { value: 0.012 },
+          uPointer: { value: new THREE.Vector2(0, 0) },
+          uMouseStrength: { value: 0.4 },
+          uMouseReact: { value: 1.0 }
+        }
+      });
+
+      crtMesh = new THREE.Mesh(geometry, crtMaterial);
+      crtScene.add(crtMesh);
+
+      crtRenderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power' });
+      crtRenderer.setPixelRatio(1);
+      crtRenderer.setSize(container.clientWidth || 640, container.clientHeight || 360, false);
+      container.appendChild(crtRenderer.domElement);
+      crtClock = new THREE.Clock();
+
+      const onResize = () => {
+        if (!container || !crtRenderer || !crtMaterial) return;
+        const w = container.clientWidth || 640;
+        const h = container.clientHeight || 360;
+        crtRenderer.setSize(w, h, false);
+        crtMaterial.uniforms.uResolution.value.set(w, h);
+      };
+      window.addEventListener('resize', onResize);
+    }
+
+    function toggleCRTWarp() {
+      if (guitarAudio && guitarAudio.playUiClick) guitarAudio.playUiClick(1600);
+      isCRTWarpActive = !isCRTWarpActive;
+      const overlay = document.getElementById('crtWarpOverlay');
+      const btnText = document.getElementById('crtBtnText');
+
+      if (btnText) {
+        btnText.textContent = isCRTWarpActive ? 'CRT: On' : 'CRT: Off';
+      }
+
+      if (!overlay) return;
+
+      if (isCRTWarpActive) {
+        overlay.style.display = 'block';
+        if (!crtRenderer) initCRTWarp();
+        if (!crtRaf) crtRaf = requestAnimationFrame(renderCRTWarp);
+      } else {
+        overlay.style.display = 'none';
+        if (crtRaf) {
+          cancelAnimationFrame(crtRaf);
+          crtRaf = null;
+        }
+      }
+    }
+
+    function renderCRTWarp() {
+      if (!isCRTWarpActive) return;
+      if (crtRenderer && crtScene && crtCamera && crtMaterial) {
+        const delta = crtClock ? crtClock.getDelta() : 0.03;
+        crtMaterial.uniforms.uTime.value += delta * 0.5;
+        crtRenderer.render(crtScene, crtCamera);
+      }
+      crtRaf = requestAnimationFrame(renderCRTWarp);
+    }
+
     /* ==========================================================================
        REACT BITS: CLICK SPARK ENGINE
        ========================================================================== */

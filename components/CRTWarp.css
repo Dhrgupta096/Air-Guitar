@@ -1,0 +1,14 @@
+.crt-warp-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #080808;
+  border-radius: 8px;
+}
+
+.crt-warp-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

@@ -18,25 +18,24 @@
 
   <style>
     :root {
-      --bg: #090a0f;
-      --card-bg: #11141c;
-      --card-bg-elevated: #161a25;
+      --bg: #121212;
+      --card-bg: #1a1a1a;
+      --card-bg-elevated: #222222;
       --border: rgba(255, 255, 255, 0.08);
       --border-hover: rgba(255, 255, 255, 0.16);
       --border-active: #d97706;
-      --gold: #f59e0b;
-      --gold-hover: #fbbf24;
-      --gold-glow: rgba(245, 158, 11, 0.2);
-      --gold-subtle: rgba(245, 158, 11, 0.1);
+      --gold: #d97706;
+      --gold-hover: #f59e0b;
+      --gold-subtle: rgba(217, 119, 6, 0.12);
       --fret-wood: #261c16;
       --fret-wood-dark: #150f0c;
-      --finger-1: #38bdf8;
-      --finger-2: #34d399;
-      --finger-3: #fbbf24;
-      --finger-4: #c084fc;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --finger-1: #e5e5e5;
+      --finger-2: #10b981;
+      --finger-3: #f59e0b;
+      --finger-4: #ef4444;
+      --text: #f5f5f5;
+      --text-muted: #8a8a8a;
+      --text-dim: #555555;
     }
 
     * {
@@ -48,10 +47,7 @@
     }
 
     body {
-      background: #090b10;
-      background-image: 
-        radial-gradient(ellipse at 50% 0%, rgba(30, 41, 59, 0.3) 0%, rgba(9, 11, 16, 0.95) 70%),
-        linear-gradient(180deg, #0d1017 0%, #08090d 100%);
+      background: #121212;
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -71,12 +67,9 @@
       align-items: center;
       padding: 10px 18px;
       margin-bottom: 14px;
-      background: rgba(15, 18, 26, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: #181818;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
     }
 
     .brand-group {
@@ -193,17 +186,14 @@
     }
 
     .chord-card {
-      background: rgba(13, 16, 23, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: 10px;
-      padding: 9px 13px;
+      background: rgba(24, 24, 24, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
       display: flex;
       flex-direction: column;
-      gap: 3px;
-      max-width: 320px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      gap: 2px;
+      max-width: 300px;
       pointer-events: auto;
     }
 
@@ -214,7 +204,7 @@
     }
 
     .chord-name-huge {
-      font-size: 1.85rem;
+      font-size: 1.75rem;
       font-weight: 800;
       color: var(--gold);
       line-height: 1;
@@ -222,8 +212,8 @@
     }
 
     .chord-full-name {
-      font-size: 0.92rem;
-      font-weight: 700;
+      font-size: 0.9rem;
+      font-weight: 600;
       color: #ffffff;
       letter-spacing: -0.01em;
     }
@@ -231,7 +221,7 @@
     .lyrics-tag {
       font-size: 0.78rem;
       font-weight: 500;
-      color: #94a3b8;
+      color: #8a8a8a;
       font-style: italic;
       display: flex;
       align-items: center;
@@ -239,7 +229,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 280px;
+      max-width: 270px;
     }
 
     .lyrics-tag::before {
@@ -263,7 +253,7 @@
       border-radius: 4px;
       font-size: 0.68rem;
       font-family: ui-monospace, SFMono-Regular, monospace;
-      color: #cbd5e1;
+      color: #d4d4d4;
     }
 
     /* CENTER STRUM VELOCITY GAUGE */
@@ -275,16 +265,13 @@
     }
 
     .velocity-hud-pill {
-      background: rgba(13, 16, 23, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: 18px;
+      background: rgba(24, 24, 24, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 4px 11px;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .velocity-label {
@@ -328,16 +315,13 @@
     }
 
     .metric-card {
-      background: rgba(13, 16, 23, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: 10px;
+      background: rgba(24, 24, 24, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       padding: 6px 12px;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .metric-title {
@@ -367,22 +351,14 @@
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: #ef4444;
-      box-shadow: 0 0 8px #ef4444;
+      background: #737373;
     }
 
     .dot.live {
       background: #22c55e;
-      box-shadow: 0 0 10px #22c55e;
-      animation: pulseDot 2s infinite ease-in-out;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.3); opacity: 0.7; }
     }
 
     /* STAGE BOTTOM CONTROLS */
@@ -399,24 +375,23 @@
     }
 
     .stage-pill-btn {
-      background: rgba(10, 14, 24, 0.8);
+      background: rgba(24, 24, 24, 0.9);
       border: 1px solid var(--border);
-      backdrop-filter: blur(12px);
       color: var(--text);
       padding: 6px 12px;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 0.76rem;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
       pointer-events: auto;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
     .stage-pill-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: #2a2a2a;
       border-color: var(--border-hover);
     }
 
@@ -424,9 +399,7 @@
     .start-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(7, 9, 14, 0.94);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: rgba(18, 18, 18, 0.96);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -434,7 +407,7 @@
       z-index: 30;
       padding: 30px;
       text-align: center;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
     }
 
     .start-overlay.hidden {
@@ -555,40 +528,42 @@
     }
 
     .song-dropdown option {
-      background: #0f1422;
+      background: #1e1e1e;
       color: #ffffff;
     }
 
     .audio-btn {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 0.86rem;
-      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
     .audio-btn:hover {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.1);
       border-color: var(--border-hover);
     }
 
     .audio-btn.primary {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #07090e;
-      border-color: var(--gold);
-      box-shadow: 0 4px 16px var(--gold-glow);
+      background: #d97706;
+      color: #121212;
+      border: 1px solid #d97706;
+      font-weight: 700;
+      box-shadow: none;
     }
 
     .audio-btn.primary:hover {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      box-shadow: 0 6px 22px rgba(245, 158, 11, 0.4);
+      background: #f59e0b;
+      border-color: #f59e0b;
+      box-shadow: none;
     }
 
     .visualizer-wrapper {
@@ -652,7 +627,6 @@
 
     .toggle-checkbox:checked + .toggle-switch {
       background: var(--gold);
-      box-shadow: 0 0 14px var(--gold-glow);
     }
 
     .toggle-checkbox:checked + .toggle-switch::after {
@@ -689,29 +663,28 @@
       padding: 6px 14px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 8px;
     }
 
     .vinyl-disc-outer {
       position: relative;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: #181c26;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #242424;
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       color: var(--gold);
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
     }
 
     .vinyl-disc-outer.spinning {
-      background: rgba(245, 158, 11, 0.15);
-      border-color: rgba(245, 158, 11, 0.4);
-      color: var(--gold-hover);
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+      background: rgba(217, 119, 6, 0.15);
+      border-color: var(--gold);
+      color: var(--gold);
     }
 
     .vinyl-track-info {
@@ -745,17 +718,17 @@
       align-items: center;
       gap: 12px;
       width: 100%;
-      background: rgba(0, 0, 0, 0.28);
+      background: rgba(0, 0, 0, 0.25);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 7px 14px;
+      border-radius: 8px;
+      padding: 6px 12px;
     }
 
     .song-timeline-bar {
       flex: 1;
-      height: 6px;
+      height: 5px;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
+      border-radius: 3px;
       position: relative;
       cursor: pointer;
       overflow: hidden;
@@ -764,9 +737,8 @@
     .song-timeline-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #f59e0b, #fbbf24);
-      border-radius: 4px;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+      background: var(--gold);
+      border-radius: 3px;
       transition: width 0.1s linear;
     }
 
@@ -823,10 +795,9 @@
     }
 
     .prog-chip.active {
-      background: rgba(245, 158, 11, 0.25);
+      background: #262626;
       border-color: var(--gold);
       color: var(--gold);
-      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
     }
 
     /* REAL GUITAR FRETBOARD INTERACTIVE PANEL */
@@ -1012,23 +983,22 @@
     }
 
     .chord-pad.active {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #07090e;
+      background: var(--gold);
+      color: #121212;
       border-color: var(--gold);
-      box-shadow: 0 6px 20px var(--gold-glow);
-      transform: translateY(-2px);
+      transform: translateY(0);
     }
 
     .chord-pad-key {
       font-size: 1.25rem;
-      font-weight: 900;
+      font-weight: 800;
       line-height: 1;
     }
 
     .chord-pad-sub {
       font-size: 0.65rem;
       text-transform: uppercase;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 0.05em;
       opacity: 0.8;
     }
@@ -1039,13 +1009,13 @@
       right: 6px;
       font-size: 0.62rem;
       font-family: ui-monospace, monospace;
-      font-weight: 800;
+      font-weight: 700;
       opacity: 0.55;
     }
 
     .chord-pad.active .chord-pad-keynum {
       opacity: 0.85;
-      color: #07090e;
+      color: #121212;
     }
 
     /* GUIDE CARDS */
@@ -1059,12 +1029,11 @@
     .guide-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 10px;
       padding: 14px 18px;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: var(--text-muted);
       line-height: 1.45;
-      backdrop-filter: blur(12px);
     }
 
     .guide-card strong {
@@ -1073,23 +1042,21 @@
       align-items: center;
       gap: 6px;
       margin-bottom: 6px;
-      font-size: 0.94rem;
+      font-size: 0.92rem;
     }
 
     /* SHORTCUTS MODAL */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(5, 7, 12, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(0, 0, 0, 0.75);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 100;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
       padding: 20px;
     }
 
@@ -1099,15 +1066,15 @@
     }
 
     .modal-dialog {
-      background: #0f1422;
-      border: 1px solid var(--border-active);
-      border-radius: 18px;
+      background: #1e1e1e;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       max-width: 480px;
       width: 100%;
       padding: 24px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-      transform: scale(0.95);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      transform: scale(0.98);
+      transition: transform 0.2s ease;
     }
 
     .modal-overlay.open .modal-dialog {
@@ -1951,7 +1918,7 @@
        4. INTERACTIVE FRETBOARD CANVAS RENDERER
        ========================================================================== */
     const STRING_NAMES = ['6 (E)', '5 (A)', '4 (D)', '3 (G)', '2 (B)', '1 (e)'];
-    const FINGER_COLORS = { 1: '#38bdf8', 2: '#4ade80', 3: '#fbbf24', 4: '#c084fc' };
+    const FINGER_COLORS = { 1: '#e5e5e5', 2: '#10b981', 3: '#f59e0b', 4: '#ef4444' };
 
     function resizeFretboardCanvas() {
       if (!fCanvas || !fCtx) return;
@@ -1998,7 +1965,7 @@
       const stringSpacing = (h - topMargin - bottomMargin) / 5;
 
       // Draw Bone Nut
-      fCtx.fillStyle = "#e2e8f0";
+      fCtx.fillStyle = "#e5e5e5";
       fCtx.fillRect(leftMargin - 6, topMargin - 4, 6, h - topMargin - bottomMargin + 8);
       fCtx.fillStyle = "rgba(0,0,0,0.3)";
       fCtx.fillRect(leftMargin - 1, topMargin - 4, 1, h - topMargin - bottomMargin + 8);
@@ -2009,26 +1976,22 @@
         fCtx.fillStyle = "rgba(0, 0, 0, 0.5)";
         fCtx.fillRect(fx - 2, topMargin - 4, 4, h - topMargin - bottomMargin + 8);
 
-        fCtx.fillStyle = "#cbd5e1";
+        fCtx.fillStyle = "#d4d4d4";
         fCtx.fillRect(fx - 1, topMargin - 4, 2, h - topMargin - bottomMargin + 8);
 
-        fCtx.fillStyle = "#94a3b8";
+        fCtx.fillStyle = "#8a8a8a";
         fCtx.font = "bold 11px -apple-system, sans-serif";
         fCtx.textAlign = "center";
         fCtx.fillText(`Fret ${f}`, fx - fretWidth * 0.5, h - 5);
       }
 
-      // Mother of Pearl Dot at Fret 3
+      // Mother of Pearl Dot at Fret 3 (flat matte inlay, no neon blur)
       const dotX = leftMargin + 2.5 * fretWidth;
       const dotY = topMargin + 2.5 * stringSpacing;
-      fCtx.save();
       fCtx.fillStyle = "rgba(255, 255, 255, 0.4)";
-      fCtx.shadowColor = "rgba(255, 255, 255, 0.3)";
-      fCtx.shadowBlur = 6;
       fCtx.beginPath();
-      fCtx.arc(dotX, dotY, 6.5, 0, Math.PI * 2);
+      fCtx.arc(dotX, dotY, 6, 0, Math.PI * 2);
       fCtx.fill();
-      fCtx.restore();
 
       const chord = CHORD_LIBRARY[activeChordKey] || CHORD_LIBRARY['Em'];
       const stringGauges = [3.6, 2.9, 2.3, 1.8, 1.4, 1.0];
@@ -2042,7 +2005,7 @@
 
         const sy = topMargin + s * stringSpacing;
 
-        fCtx.fillStyle = "#94a3b8";
+        fCtx.fillStyle = "#8a8a8a";
         fCtx.font = "bold 11px monospace";
         fCtx.textAlign = "left";
         fCtx.fillText(STRING_NAMES[s], 8, sy + 4);
@@ -2075,14 +2038,14 @@
           strGrad.addColorStop(1, "#78350f");
         } else {
           strGrad.addColorStop(0, "#ffffff");
-          strGrad.addColorStop(0.5, "#cbd5e1");
-          strGrad.addColorStop(1, "#475569");
+          strGrad.addColorStop(0.5, "#a3a3a3");
+          strGrad.addColorStop(1, "#525252");
         }
         fCtx.fillStyle = strGrad;
         fCtx.fillRect(leftMargin, sy + vib - stringGauges[s] * 0.5, w - leftMargin - rightMargin, stringGauges[s]);
       }
 
-      // Draw Finger Placement Dots with glowing pulse rings
+      // Draw Finger Placement Dots (clean solid hardware markers, no neon blur)
       chord.fingers.forEach(f => {
         const fx = leftMargin + (f.fret - 0.5) * fretWidth;
         const vib = (stringVibrations[f.string] || 0) * Math.sin(performance.now() * 0.06 + f.string) * 3.5;
@@ -2090,16 +2053,17 @@
         const color = FINGER_COLORS[f.finger] || '#f59e0b';
 
         fCtx.save();
-        fCtx.shadowColor = color;
-        fCtx.shadowBlur = 12;
         fCtx.fillStyle = color;
         fCtx.beginPath();
-        fCtx.arc(fx, fy, 13.5, 0, Math.PI * 2);
+        fCtx.arc(fx, fy, 12, 0, Math.PI * 2);
         fCtx.fill();
+        fCtx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+        fCtx.lineWidth = 1.5;
+        fCtx.stroke();
         fCtx.restore();
 
-        fCtx.fillStyle = "#050608";
-        fCtx.font = "bold 13px -apple-system, sans-serif";
+        fCtx.fillStyle = (f.finger === 1) ? "#121212" : "#ffffff";
+        fCtx.font = "bold 12px -apple-system, sans-serif";
         fCtx.textAlign = "center";
         fCtx.textBaseline = "middle";
         fCtx.fillText(f.finger, fx, fy);
@@ -2367,8 +2331,6 @@
         ctx.save();
         ctx.fillStyle = p.color;
         ctx.globalAlpha = Math.max(0, p.life);
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 8;
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(1, p.size * p.life), 0, Math.PI * 2);
         ctx.fill();

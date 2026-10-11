@@ -15,6 +15,7 @@
 
   <!-- GSAP CDN for React Bits Animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <!-- Three.js CDN for React Bits 3D Shaders -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- MediaPipe Hands CDN -->
@@ -1481,6 +1482,50 @@
       line-height: 1;
     }
 
+    /* REACT BITS: SCROLL FLOAT STYLES */
+    .scroll-float-wrapper {
+      width: 100%;
+      text-align: center;
+      margin: 28px 0 16px 0;
+      overflow: hidden;
+      padding: 0 12px;
+    }
+
+    .scroll-float {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+
+    .scroll-float-text {
+      display: inline-block;
+      font-size: clamp(1.4rem, 4vw, 2.6rem);
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.25;
+      font-family: var(--font-sans);
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .scroll-float .char {
+      display: inline-block;
+      will-change: opacity, transform;
+      color: #ffffff;
+    }
+
+    .scroll-float-sub {
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
   /* REACT BITS: BUBBLE MENU STYLES */
 .bubble-menu {
   left: 0;
@@ -2374,6 +2419,14 @@
           <span>Acoustic Rock:</span> <strong>Em · G · D · A</strong>
         </button>
       </div>
+    </div>
+
+    <!-- React Bits: ScrollFloat Performance Headline -->
+    <div class="scroll-float-wrapper">
+      <h2 class="scroll-float" id="guideScrollFloat">
+        <span class="scroll-float-text">AIR GUITAR STUDIO</span>
+      </h2>
+      <div class="scroll-float-sub">PRECISION OPTICAL HARMONICS · 48 kHz WEBAUDIO ENGINE</div>
     </div>
 
     <!-- Quick Performance Guide -->
@@ -4101,6 +4154,114 @@ void main() {
       });
     }
 
+    /* ==========================================================================
+       REACT BITS: SCROLL FLOAT COMPONENT (GSAP / SCROLLTRIGGER CHARACTER FLOAT)
+       ========================================================================== */
+    var scrollFloatInstance = null;
+
+    class ScrollFloatDOM {
+      constructor(element, options = {}) {
+        this.el = element;
+        this.animationDuration = options.animationDuration || 1;
+        this.ease = options.ease || 'back.inOut(2)';
+        this.scrollStart = options.scrollStart || 'top bottom-=15%';
+        this.scrollEnd = options.scrollEnd || 'bottom center+=20%';
+        this.stagger = options.stagger !== undefined ? options.stagger : 0.03;
+
+        this.init();
+      }
+
+      init() {
+        if (!this.el) return;
+        const textSpan = this.el.querySelector('.scroll-float-text') || this.el;
+        const rawText = textSpan.textContent.trim();
+        textSpan.innerHTML = '';
+
+        const chars = [];
+        for (let i = 0; i < rawText.length; i++) {
+          const char = rawText[i];
+          const span = document.createElement('span');
+          span.className = 'char';
+          span.textContent = char === ' ' ? '\u00A0' : char;
+          textSpan.appendChild(span);
+          chars.push(span);
+        }
+
+        if (typeof gsap !== 'undefined') {
+          if (typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.fromTo(
+              chars,
+              {
+                willChange: 'opacity, transform',
+                opacity: 0,
+                yPercent: 120,
+                scaleY: 2.3,
+                scaleX: 0.7,
+                transformOrigin: '50% 0%'
+              },
+              {
+                duration: this.animationDuration,
+                ease: this.ease,
+                opacity: 1,
+                yPercent: 0,
+                scaleY: 1,
+                scaleX: 1,
+                stagger: this.stagger,
+                scrollTrigger: {
+                  trigger: this.el,
+                  start: this.scrollStart,
+                  end: this.scrollEnd,
+                  scrub: true
+                }
+              }
+            );
+          } else {
+            const observer = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  gsap.fromTo(
+                    chars,
+                    {
+                      willChange: 'opacity, transform',
+                      opacity: 0,
+                      yPercent: 120,
+                      scaleY: 2.3,
+                      scaleX: 0.7,
+                      transformOrigin: '50% 0%'
+                    },
+                    {
+                      duration: this.animationDuration,
+                      ease: this.ease,
+                      opacity: 1,
+                      yPercent: 0,
+                      scaleY: 1,
+                      scaleX: 1,
+                      stagger: this.stagger
+                    }
+                  );
+                  observer.disconnect();
+                }
+              });
+            }, { threshold: 0.2 });
+            observer.observe(this.el);
+          }
+        }
+      }
+    }
+
+    function initScrollFloat() {
+      const el = document.getElementById('guideScrollFloat');
+      if (!el) return;
+      scrollFloatInstance = new ScrollFloatDOM(el, {
+        animationDuration: 1,
+        ease: 'back.inOut(2)',
+        scrollStart: 'top bottom-=15%',
+        scrollEnd: 'bottom center+=20%',
+        stagger: 0.03
+      });
+    }
+
     function initDomReferences() {
       webcamElement = document.getElementById('webcam');
       canvas = document.getElementById('trackingCanvas');
@@ -5380,6 +5541,7 @@ void main() {
       initDomReferences();
       resizeFretboardCanvas();
       initCurvedLoop();
+      initScrollFloat();
       initTrackOptionWheel();
       initFlyingPosters();
       initClickSpark();

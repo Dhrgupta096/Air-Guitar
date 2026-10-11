@@ -2109,6 +2109,88 @@
        REACT BITS: OPTION WHEEL ENGINE
        ========================================================================== */
     /* ==========================================================================
+       REACT BITS: CLICK SPARK ENGINE
+       ========================================================================== */
+    var clickSparks = [];
+    var clickSparkCanvas = null;
+    var clickSparkCtx = null;
+    var clickSparkRaf = null;
+
+    function initClickSpark() {
+      clickSparkCanvas = document.getElementById('clickSparkCanvas');
+      if (!clickSparkCanvas) return;
+      clickSparkCtx = clickSparkCanvas.getContext('2d');
+
+      const resize = () => {
+        const dpr = window.devicePixelRatio || 1;
+        clickSparkCanvas.width = window.innerWidth * dpr;
+        clickSparkCanvas.height = window.innerHeight * dpr;
+        if (clickSparkCtx) clickSparkCtx.scale(dpr, dpr);
+      };
+      resize();
+      window.addEventListener('resize', resize);
+
+      window.addEventListener('pointerdown', (e) => {
+        triggerClickSpark(e.clientX, e.clientY);
+      }, { passive: true });
+    }
+
+    function triggerClickSpark(x, y, color = '#f59e0b', count = 8, radius = 20, size = 11, duration = 380) {
+      const now = performance.now();
+      for (let i = 0; i < count; i++) {
+        clickSparks.push({
+          x,
+          y,
+          angle: (2 * Math.PI * i) / count,
+          startTime: now,
+          color,
+          radius,
+          size,
+          duration
+        });
+      }
+      if (!clickSparkRaf) {
+        clickSparkRaf = requestAnimationFrame(drawClickSparks);
+      }
+    }
+
+    function drawClickSparks(timestamp) {
+      if (!clickSparkCtx || !clickSparkCanvas) return;
+      clickSparkCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      clickSparks = clickSparks.filter(spark => {
+        const elapsed = timestamp - spark.startTime;
+        if (elapsed >= spark.duration) return false;
+
+        const p = elapsed / spark.duration;
+        const eased = p * (2 - p); // ease-out
+
+        const distance = eased * spark.radius;
+        const lineLen = spark.size * (1 - eased);
+
+        const x1 = spark.x + distance * Math.cos(spark.angle);
+        const y1 = spark.y + distance * Math.sin(spark.angle);
+        const x2 = spark.x + (distance + lineLen) * Math.cos(spark.angle);
+        const y2 = spark.y + (distance + lineLen) * Math.sin(spark.angle);
+
+        clickSparkCtx.strokeStyle = spark.color;
+        clickSparkCtx.lineWidth = 1.8;
+        clickSparkCtx.beginPath();
+        clickSparkCtx.moveTo(x1, y1);
+        clickSparkCtx.lineTo(x2, y2);
+        clickSparkCtx.stroke();
+
+        return true;
+      });
+
+      if (clickSparks.length > 0) {
+        clickSparkRaf = requestAnimationFrame(drawClickSparks);
+      } else {
+        clickSparkRaf = null;
+      }
+    }
+
+    /* ==========================================================================
        REACT BITS: ANTIGRAVITY PARTICLE FIELD ENGINE
        ========================================================================== */
     var isAntigravityEnabled = true;
@@ -2885,6 +2967,7 @@
 
         const vinylDisc = document.getElementById('vinylDisc');
       initTrackOptionWheel();
+      initClickSpark();
         if (vinylDisc) vinylDisc.classList.add('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "NOW PLAYING";
@@ -2898,6 +2981,7 @@
 
         const vinylDisc = document.getElementById('vinylDisc');
       initTrackOptionWheel();
+      initClickSpark();
         if (vinylDisc) vinylDisc.classList.remove('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "PAUSED";
@@ -3802,6 +3886,7 @@
 
       const vinylDisc = document.getElementById('vinylDisc');
       initTrackOptionWheel();
+      initClickSpark();
       if (vinylDisc) vinylDisc.classList.add('spinning');
       const vinylTitle = document.getElementById('vinylTrackTitle');
       if (vinylTitle) vinylTitle.textContent = file.name;
@@ -3848,5 +3933,7 @@
       initImmediateSetup();
     }
   </script>
+  <!-- React Bits: ClickSpark Overlay Canvas -->
+  <canvas id="clickSparkCanvas" style="position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;"></canvas>
 </body>
 </html>

@@ -6,7 +6,12 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>AirGuitar Studio — Webcam Acoustic Guitar Player</title>
+  <title>AirGuitar Studio — Optical Acoustic Instrument</title>
+
+  <!-- High-End Studio Typography (Geist & JetBrains Mono) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- MediaPipe Hands CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js" crossorigin="anonymous"></script>
@@ -18,36 +23,40 @@
 
   <style>
     :root {
-      --bg: #121212;
-      --card-bg: #1a1a1a;
-      --card-bg-elevated: #222222;
+      --bg: #0e0e0e;
+      --card-bg: #141414;
+      --card-bg-elevated: #1a1a1a;
+      --card-inset: #0a0a0a;
       --border: rgba(255, 255, 255, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.04);
       --border-hover: rgba(255, 255, 255, 0.16);
       --border-active: #d97706;
       --gold: #d97706;
       --gold-hover: #f59e0b;
       --gold-subtle: rgba(217, 119, 6, 0.12);
-      --fret-wood: #261c16;
+      --fret-wood: #221712;
       --fret-wood-dark: #150f0c;
       --finger-1: #e5e5e5;
       --finger-2: #10b981;
       --finger-3: #f59e0b;
       --finger-4: #ef4444;
       --text: #f5f5f5;
-      --text-muted: #8a8a8a;
-      --text-dim: #555555;
+      --text-muted: #888888;
+      --text-dim: #505050;
+      --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+      font-family: var(--font-sans);
       user-select: none;
     }
 
     body {
-      background: #121212;
+      background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -55,21 +64,22 @@
       align-items: center;
       padding: 16px;
       overflow-x: hidden;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.015em;
     }
 
-    /* TOP NAVBAR */
+    /* TOP STUDIO MASTHEAD */
     .top-navbar {
       width: 100%;
       max-width: 1080px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 18px;
+      padding: 10px 16px;
       margin-bottom: 14px;
-      background: #181818;
+      background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
     .brand-group {
@@ -79,31 +89,52 @@
     }
 
     .brand-logo-mark {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      background: rgba(245, 158, 11, 0.1);
-      border: 1px solid rgba(245, 158, 11, 0.25);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #1c1c1c;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--gold);
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-text-col {
+      display: flex;
+      flex-direction: column;
     }
 
     .brand-text-col h1 {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
       color: #ffffff;
       display: flex;
       align-items: center;
       gap: 8px;
+      line-height: 1.2;
+    }
+
+    .studio-badge {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(217, 119, 6, 0.12);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
     }
 
     .brand-subtitle {
-      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
       color: var(--text-muted);
-      margin-top: 1px;
+      letter-spacing: 0.04em;
     }
 
     .nav-actions {
@@ -112,24 +143,49 @@
       gap: 8px;
     }
 
+    .latency-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      background: #101010;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .latency-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
     .nav-pill-btn {
-      background: rgba(255, 255, 255, 0.04);
+      background: #1a1a1a;
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 6px 13px;
-      border-radius: 8px;
-      font-size: 0.78rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.76rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.15s ease;
+      transition: all 0.12s ease;
     }
 
     .nav-pill-btn:hover {
-      background: rgba(255, 255, 255, 0.09);
+      background: #242424;
       border-color: var(--border-hover);
+    }
+
+    .nav-pill-btn:active {
+      transform: translateY(1px);
     }
 
     .main-container {
@@ -141,13 +197,13 @@
       width: 100%;
     }
 
-    /* STAGE WRAPPER */
+    /* STAGE MONITOR VIEWPORT */
     .stage-wrapper {
       position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
       max-height: 640px;
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
       background: #000000;
       border: 1px solid var(--border);
@@ -169,7 +225,7 @@
       width: 100%;
       height: 100%;
       display: block;
-      cursor: pointer;
+      cursor: crosshair;
     }
 
     /* STAGE LIVE HUD OVERLAY */
@@ -186,15 +242,16 @@
     }
 
     .chord-card {
-      background: rgba(24, 24, 24, 0.9);
+      background: rgba(18, 18, 18, 0.94);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 8px 12px;
+      padding: 8px 14px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
       max-width: 300px;
       pointer-events: auto;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .chord-title-row {
@@ -204,24 +261,25 @@
     }
 
     .chord-name-huge {
-      font-size: 1.75rem;
+      font-size: 1.85rem;
       font-weight: 800;
-      color: var(--gold);
+      color: var(--gold-hover);
       line-height: 1;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
     }
 
     .chord-full-name {
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.86rem;
+      font-weight: 700;
       color: #ffffff;
-      letter-spacing: -0.01em;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
     }
 
     .lyrics-tag {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 500;
-      color: #8a8a8a;
+      color: var(--text-muted);
       font-style: italic;
       display: flex;
       align-items: center;
@@ -229,7 +287,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 270px;
+      max-width: 260px;
     }
 
     .lyrics-tag::before {
@@ -242,17 +300,18 @@
     .chord-voicing-pills {
       display: flex;
       gap: 4px;
-      margin-top: 2px;
+      margin-top: 3px;
       flex-wrap: wrap;
     }
 
     .voicing-pill {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 2px 5px;
+      padding: 2px 6px;
       border-radius: 4px;
-      font-size: 0.68rem;
-      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 0.66rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
       color: #d4d4d4;
     }
 
@@ -265,27 +324,29 @@
     }
 
     .velocity-hud-pill {
-      background: rgba(24, 24, 24, 0.9);
+      background: rgba(18, 18, 18, 0.94);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 4px 11px;
+      border-radius: 6px;
+      padding: 5px 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .velocity-label {
-      font-size: 0.68rem;
+      font-size: 0.64rem;
+      font-family: var(--font-mono);
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       color: var(--gold);
     }
 
     .velocity-bar-track {
-      width: 70px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.12);
+      width: 76px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 2px;
       overflow: hidden;
     }
@@ -295,15 +356,15 @@
       width: 0%;
       background: var(--gold);
       border-radius: 2px;
-      transition: width 0.12s ease-out;
+      transition: width 0.1s ease-out;
     }
 
     .velocity-pct {
       font-size: 0.68rem;
-      font-family: ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-weight: 700;
       color: #ffffff;
-      min-width: 24px;
+      min-width: 26px;
       text-align: right;
     }
 
@@ -315,39 +376,30 @@
     }
 
     .metric-card {
-      background: rgba(24, 24, 24, 0.9);
+      background: rgba(18, 18, 18, 0.94);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 6px 12px;
       display: flex;
       align-items: center;
       gap: 8px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .metric-title {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
+      font-family: var(--font-mono);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
       font-weight: 700;
     }
 
     .metric-value {
       font-size: 0.82rem;
+      font-family: var(--font-mono);
       font-weight: 700;
       color: #ffffff;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.55);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      border: 1px solid var(--border);
     }
 
     .dot {
@@ -361,7 +413,7 @@
       background: #22c55e;
     }
 
-    /* STAGE BOTTOM CONTROLS */
+    /* STAGE BOTTOM ACTION BAR */
     .stage-bottom-bar {
       position: absolute;
       bottom: 12px;
@@ -375,31 +427,36 @@
     }
 
     .stage-pill-btn {
-      background: rgba(24, 24, 24, 0.9);
+      background: rgba(18, 18, 18, 0.94);
       border: 1px solid var(--border);
       color: var(--text);
       padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.76rem;
+      border-radius: 6px;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       pointer-events: auto;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.15s ease;
+      transition: all 0.12s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .stage-pill-btn:hover {
-      background: #2a2a2a;
+      background: #242424;
       border-color: var(--border-hover);
+    }
+
+    .stage-pill-btn:active {
+      transform: translateY(1px);
     }
 
     /* START OVERLAY */
     .start-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(18, 18, 18, 0.96);
+      background: rgba(14, 14, 14, 0.96);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -417,7 +474,7 @@
     }
 
     .start-overlay h2 {
-      font-size: 2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       color: #ffffff;
       letter-spacing: -0.03em;
@@ -429,29 +486,30 @@
       color: var(--text-muted);
       font-size: 0.92rem;
       line-height: 1.5;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
 
     .primary-btn {
       background: var(--gold);
-      color: #050608;
-      font-size: 0.95rem;
+      color: #0e0e0e;
+      font-size: 0.92rem;
       font-weight: 700;
-      padding: 12px 28px;
-      border-radius: 10px;
-      border: none;
+      padding: 12px 26px;
+      border-radius: 8px;
+      border: 1px solid var(--gold-hover);
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
-      transition: all 0.15s ease;
+      transition: all 0.12s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
 
     .primary-btn:hover {
       background: var(--gold-hover);
-      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+      border-color: #fde68a;
     }
 
     .primary-btn:active {
       transform: translateY(1px);
+      box-shadow: none;
     }
 
     .secondary-btn {
@@ -460,10 +518,10 @@
       font-size: 0.9rem;
       font-weight: 600;
       padding: 12px 24px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid var(--border);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.12s ease;
     }
 
     .secondary-btn:hover {
@@ -471,19 +529,21 @@
       border-color: var(--border-hover);
     }
 
-    /* SONG MIXER & VOCALS DECK (STUDIO STRIP) */
+    .secondary-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* STUDIO MIXER & VOCALS DECK */
     .bg-song-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 18px;
-      padding: 16px 20px;
+      border-radius: 12px;
+      padding: 14px 18px;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .bg-song-row {
@@ -494,184 +554,22 @@
       gap: 12px;
     }
 
-    .song-deck-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .song-title-label {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--gold);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .song-dropdown {
-      background: rgba(255, 255, 255, 0.07);
-      color: #ffffff;
-      border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 0.88rem;
-      outline: none;
-      transition: border 0.2s;
-    }
-
-    .song-dropdown:hover, .song-dropdown:focus {
-      border-color: var(--border-active);
-    }
-
-    .song-dropdown option {
-      background: #1e1e1e;
-      color: #ffffff;
-    }
-
-    .audio-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: #ffffff;
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: 0.84rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      transition: all 0.15s ease;
-    }
-
-    .audio-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--border-hover);
-    }
-
-    .audio-btn.primary {
-      background: #d97706;
-      color: #121212;
-      border: 1px solid #d97706;
-      font-weight: 700;
-      box-shadow: none;
-    }
-
-    .audio-btn.primary:hover {
-      background: #f59e0b;
-      border-color: #f59e0b;
-      box-shadow: none;
-    }
-
-    .visualizer-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 10px;
-    }
-
-    canvas#audioVisualizer {
-      width: 140px;
-      height: 24px;
-      display: block;
-    }
-
-    /* TOGGLE SWITCH */
-    .toggle-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 6px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      transition: border 0.2s;
-    }
-
-    .toggle-wrapper:hover {
-      border-color: var(--border-hover);
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: rgba(255, 255, 255, 0.16);
-      border-radius: 12px;
-      transition: background 0.3s;
-    }
-
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 20px;
-      height: 20px;
-      background: white;
-      border-radius: 50%;
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    .toggle-checkbox {
-      display: none;
-    }
-
-    .toggle-checkbox:checked + .toggle-switch {
-      background: var(--gold);
-    }
-
-    .toggle-checkbox:checked + .toggle-switch::after {
-      transform: translateX(20px);
-    }
-
-    .volume-slider-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .volume-slider-group span.vol-icon {
-      font-size: 1rem;
-    }
-
-    .volume-slider-group input[type="range"] {
-      width: 95px;
-      height: 6px;
-      accent-color: var(--gold);
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 3px;
-      cursor: pointer;
-    }
-
-    /* STUDIO TRACK WIDGET */
     .vinyl-widget {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 6px 14px;
-      background: rgba(255, 255, 255, 0.03);
+      gap: 10px;
+      padding: 6px 12px;
+      background: #0f0f0f;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
     }
 
     .vinyl-disc-outer {
       position: relative;
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      background: #242424;
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      background: #1e1e1e;
       border: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -695,7 +593,8 @@
     }
 
     .vinyl-track-now {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
+      font-family: var(--font-mono);
       text-transform: uppercase;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -703,7 +602,7 @@
     }
 
     .vinyl-track-title {
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: #ffffff;
       white-space: nowrap;
@@ -712,15 +611,207 @@
       max-width: 140px;
     }
 
+    .song-deck-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .song-title-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .song-dropdown {
+      background: #1a1a1a;
+      color: #ffffff;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.82rem;
+      outline: none;
+      transition: border 0.15s;
+    }
+
+    .song-dropdown:hover, .song-dropdown:focus {
+      border-color: var(--border-active);
+    }
+
+    .song-dropdown option {
+      background: #181818;
+      color: #ffffff;
+    }
+
+    .audio-btn {
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.12s ease;
+    }
+
+    .audio-btn:hover {
+      background: #242424;
+      border-color: var(--border-hover);
+    }
+
+    .audio-btn.primary {
+      background: var(--gold);
+      color: #0e0e0e;
+      border: 1px solid var(--gold-hover);
+      font-weight: 700;
+    }
+
+    .audio-btn.primary:hover {
+      background: var(--gold-hover);
+      border-color: #fde68a;
+    }
+
+    .audio-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* HARDWARE ANALOG LED VU METERS */
+    .vu-meter-rack {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    .vu-channel {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .vu-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .vu-ladder {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .vu-led-seg {
+      width: 4px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 1px;
+      transition: background 0.08s ease;
+    }
+
+    .vu-led-seg.lit-green {
+      background: #22c55e;
+    }
+
+    .vu-led-seg.lit-yellow {
+      background: #eab308;
+    }
+
+    .vu-led-seg.lit-red {
+      background: #ef4444;
+    }
+
+    .visualizer-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
+
+    canvas#audioVisualizer {
+      width: 130px;
+      height: 22px;
+      display: block;
+    }
+
+    /* HARDWARE TOGGLE SWITCH */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      background: #141414;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      transition: border 0.15s;
+    }
+
+    .toggle-wrapper:hover {
+      border-color: var(--border-hover);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 38px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      border-radius: 50%;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .toggle-checkbox {
+      display: none;
+    }
+
+    .toggle-checkbox:checked + .toggle-switch {
+      background: var(--gold);
+    }
+
+    .toggle-checkbox:checked + .toggle-switch::after {
+      transform: translateX(18px);
+    }
+
     /* SONG TIMELINE SCRUBBER */
     .song-timeline-wrap {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
-      background: rgba(0, 0, 0, 0.25);
+      background: #0f0f0f;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 6px 12px;
     }
 
@@ -728,7 +819,7 @@
       flex: 1;
       height: 5px;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
+      border-radius: 2px;
       position: relative;
       cursor: pointer;
       overflow: hidden;
@@ -738,13 +829,13 @@
       height: 100%;
       width: 0%;
       background: var(--gold);
-      border-radius: 3px;
+      border-radius: 2px;
       transition: width 0.1s linear;
     }
 
     .song-time-readout {
-      font-size: 0.78rem;
-      font-family: ui-monospace, monospace;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
       font-weight: 700;
       color: var(--text-muted);
       white-space: nowrap;
@@ -752,67 +843,56 @@
       text-align: right;
     }
 
-    /* SONG PROGRESSION QUICK CHIPS */
-    .progression-chips-wrap {
+    /* FADER CONTROLS */
+    .volume-slider-group {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
     }
 
-    .prog-chip-label {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      color: var(--gold);
-      margin-right: 4px;
-    }
-
-    .prog-chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: #e2e8f0;
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 20px;
+    .volume-slider-group input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 90px;
+      height: 5px;
+      background: #0c0c0c;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      outline: none;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .prog-chip:hover {
-      background: rgba(245, 158, 11, 0.15);
-      border-color: var(--border-active);
-      color: #ffffff;
-      transform: translateY(-1px);
+    .volume-slider-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 18px;
+      background: #2b2b2b;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
     }
 
-    .prog-chip.active {
-      background: #262626;
+    .volume-slider-group input[type="range"]::-webkit-slider-thumb:hover {
+      background: #383838;
       border-color: var(--gold);
-      color: var(--gold);
     }
 
-    /* REAL GUITAR FRETBOARD INTERACTIVE PANEL */
+    /* REAL GUITAR FRETBOARD PANEL */
     .fretboard-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 18px;
-      padding: 16px 20px;
+      border-radius: 12px;
+      padding: 14px 18px;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .fretboard-header {
@@ -820,15 +900,16 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
 
     .fretboard-title {
-      font-size: 0.86rem;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--gold);
-      font-weight: 800;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -836,39 +917,40 @@
 
     .fret-finger-legend {
       display: flex;
-      gap: 14px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      gap: 12px;
+      font-size: 0.74rem;
+      font-weight: 600;
       flex-wrap: wrap;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     .finger-dot {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.68rem;
-      font-weight: 900;
-      color: #050608;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: #0e0e0e;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
 
     .fretboard-canvas-container {
       position: relative;
       width: 100%;
-      height: 152px;
-      background: linear-gradient(180deg, #2b1f18 0%, #17110e 100%);
-      border-radius: 14px;
-      border: 2px solid #453225;
-      box-shadow: inset 0 6px 16px rgba(0, 0, 0, 0.8), 0 8px 24px rgba(0, 0, 0, 0.4);
+      height: 150px;
+      background: linear-gradient(180deg, #221712 0%, #150f0c 100%);
+      border-radius: 8px;
+      border: 2px solid #3d2c20;
+      box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.4);
       overflow: hidden;
       cursor: crosshair;
     }
@@ -885,51 +967,50 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      font-size: 0.84rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
     }
 
     .chord-instruction {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 10px 16px;
+      background: #0f0f0f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
       width: 100%;
     }
 
     .finger-steps {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     .finger-step-pill {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
       color: #ffffff;
     }
 
-    /* MPC-STYLE CHORD SELECTOR PADS */
+    /* MPC SILICONE CHORD PADS */
     .controls-panel {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 18px;
-      padding: 18px 20px;
+      border-radius: 12px;
+      padding: 16px 18px;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .panel-header-row {
@@ -939,11 +1020,12 @@
     }
 
     .panel-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--gold);
-      font-weight: 800;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -952,40 +1034,46 @@
     .chord-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
-      gap: 10px;
+      gap: 8px;
       width: 100%;
     }
 
     .chord-pad {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-bottom: 2px solid rgba(0, 0, 0, 0.6);
       color: var(--text);
-      padding: 10px 8px;
-      border-radius: 12px;
+      padding: 12px 6px;
+      border-radius: 8px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 3px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
+      transition: all 0.12s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
 
     .chord-pad:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--border-hover);
-      transform: translateY(-2px);
+      background: #222222;
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
     }
 
     .chord-pad:active {
-      transform: scale(0.96);
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.4);
     }
 
     .chord-pad.active {
-      background: var(--gold);
-      color: #121212;
-      border-color: var(--gold);
+      background: #241c14;
+      border: 1px solid #f59e0b;
+      border-bottom: 2px solid #b45309;
+      color: #f59e0b;
       transform: translateY(0);
     }
 
@@ -996,42 +1084,92 @@
     }
 
     .chord-pad-sub {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
+      font-family: var(--font-mono);
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.05em;
-      opacity: 0.8;
+      letter-spacing: 0.04em;
+      opacity: 0.75;
     }
 
     .chord-pad-keynum {
       position: absolute;
       top: 5px;
       right: 6px;
-      font-size: 0.62rem;
-      font-family: ui-monospace, monospace;
+      font-size: 0.6rem;
+      font-family: var(--font-mono);
       font-weight: 700;
-      opacity: 0.55;
+      opacity: 0.5;
     }
 
     .chord-pad.active .chord-pad-keynum {
       opacity: 0.85;
-      color: #121212;
+      color: #f59e0b;
+    }
+
+    /* PRESETS QUICK CHIPS */
+    .progression-chips-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .prog-chip-label {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-right: 2px;
+    }
+
+    .prog-chip {
+      background: #141414;
+      border: 1px solid var(--border);
+      color: #e5e5e5;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.12s ease;
+    }
+
+    .prog-chip:hover {
+      background: #202020;
+      border-color: var(--border-hover);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .prog-chip.active {
+      background: #241c14;
+      border-color: var(--gold);
+      color: var(--gold);
     }
 
     /* GUIDE CARDS */
     .guide-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
+      gap: 12px;
       width: 100%;
     }
 
     .guide-card {
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 18px;
-      font-size: 0.86rem;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.82rem;
       color: var(--text-muted);
       line-height: 1.45;
     }
@@ -1042,7 +1180,14 @@
       align-items: center;
       gap: 6px;
       margin-bottom: 6px;
-      font-size: 0.92rem;
+      font-size: 0.86rem;
+    }
+
+    .guide-step-num {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--gold);
+      font-weight: 700;
     }
 
     /* SHORTCUTS MODAL */
@@ -1056,7 +1201,7 @@
       z-index: 100;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       padding: 20px;
     }
 
@@ -1066,15 +1211,15 @@
     }
 
     .modal-dialog {
-      background: #1e1e1e;
+      background: #181818;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      max-width: 480px;
+      border-radius: 10px;
+      max-width: 460px;
       width: 100%;
-      padding: 24px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      padding: 22px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
       transform: scale(0.98);
-      transition: transform 0.2s ease;
+      transition: transform 0.15s ease;
     }
 
     .modal-overlay.open .modal-dialog {
@@ -1085,12 +1230,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .modal-title {
-      font-size: 1.25rem;
-      font-weight: 800;
+      font-size: 1.15rem;
+      font-weight: 700;
       color: #ffffff;
     }
 
@@ -1107,47 +1252,57 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 0.9rem;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.85rem;
     }
 
     .shortcut-key-badge {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-family: ui-monospace, monospace;
-      font-weight: 800;
+      background: #101010;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-weight: 700;
       color: var(--gold);
+      font-size: 0.78rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Glass Navbar -->
+  <!-- Top Studio Masthead -->
   <nav class="top-navbar">
     <div class="brand-group">
       <div class="brand-logo-mark">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 18V5l12-2v13"></path>
           <circle cx="6" cy="18" r="3"></circle>
           <circle cx="18" cy="16" r="3"></circle>
         </svg>
       </div>
       <div class="brand-text-col">
-        <h1>AirGuitar Studio</h1>
-        <div class="brand-subtitle">Webcam Acoustic Guitar Player</div>
+        <h1>AirGuitar Studio <span class="studio-badge">v2.4 PRO</span></h1>
+        <div class="brand-subtitle">OPTICAL ACOUSTIC INSTRUMENT · 48 kHz</div>
       </div>
     </div>
     <div class="nav-actions">
-      <button class="nav-pill-btn" onclick="openShortcutsModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"></path></svg>
-        Shortcuts
+      <div class="latency-pill">
+        <span class="latency-dot"></span>
+        <span>LATENCY: 8ms</span>
+      </div>
+      <button class="nav-pill-btn" onclick="openShortcutsModal()" title="Keyboard Shortcuts">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+          <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M8 16h8"></path>
+        </svg>
+        <span>Shortcuts</span>
       </button>
-      <button class="nav-pill-btn" onclick="toggleFullscreenStage()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-        Fullscreen
+      <button class="nav-pill-btn" onclick="toggleFullscreenStage()" title="Toggle Fullscreen Stage">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+        </svg>
+        <span>Fullscreen</span>
       </button>
     </div>
   </nav>
@@ -1182,7 +1337,7 @@
         <div class="metrics-hud">
           <div class="metric-card">
             <span class="dot" id="trackingDot"></span>
-            <span id="trackingText" style="font-size: 0.76rem; font-weight: 700;">Standby</span>
+            <span id="trackingText" style="font-size: 0.74rem; font-weight: 700; font-family: var(--font-mono);">Standby</span>
             <span style="color: rgba(255,255,255,0.25);">|</span>
             <span class="metric-title">STRUMS</span>
             <span class="metric-value" id="hudTotalStrums">0</span>
@@ -1194,7 +1349,7 @@
       <!-- Stage Bottom Action Bar -->
       <div class="stage-bottom-bar">
         <button class="stage-pill-btn" onclick="toggleCameraMirror()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"></path><path d="M4 20L21 3"></path><path d="M21 16v5h-5"></path><path d="M15 15l6 6"></path><path d="M4 4l5 5"></path></svg>
           <span id="mirrorBtnText">Mirror On</span>
         </button>
         <button class="stage-pill-btn" onclick="toggleMuteAudio()">
@@ -1202,7 +1357,7 @@
           <span id="muteBtnText">Sound On</span>
         </button>
         <button class="stage-pill-btn" onclick="toggleFullscreenStage()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
           Fullscreen
         </button>
       </div>
@@ -1211,23 +1366,23 @@
       <div class="start-overlay" id="startOverlay">
         <h2>Play Guitar in Thin Air</h2>
         <p>
-          Position yourself in front of your webcam and strum up &amp; down with your hand. Strum acoustic steel strings and jam with studio vocal backing tracks.
+          Position yourself in front of your webcam and strum up &amp; down with your hand. Strum acoustic chords in real time with studio backing tracks.
         </p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 8px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
           <button class="primary-btn" id="startBtn" onclick="initApp()">Enable Webcam</button>
-          <button class="secondary-btn" onclick="startMouseDemo()" style="margin-top: 0;">Play with Mouse / Touch</button>
+          <button class="secondary-btn" onclick="startMouseDemo()" style="margin-top: 0;">Play with Keyboard / Mouse</button>
         </div>
-        <div id="initError" style="color: #ef4444; font-size: 0.88rem; margin-top: 12px; display: none;"></div>
+        <div id="initError" style="color: #ef4444; font-size: 0.86rem; margin-top: 10px; display: none;"></div>
       </div>
     </div>
 
-    <!-- BACKGROUND VOCALS & SONG CONTROLS (STUDIO MIXER DECK) -->
+    <!-- BACKGROUND VOCALS & STUDIO MIXER DECK -->
     <div class="bg-song-card">
       <div class="bg-song-row">
         <!-- Studio Track Badge -->
         <div class="vinyl-widget">
           <div class="vinyl-disc-outer" id="vinylDisc">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
           </div>
           <div class="vinyl-track-info">
             <span class="vinyl-track-now" id="vinylTrackStatus">Track Standby</span>
@@ -1239,60 +1394,90 @@
           <span class="song-title-label">
             <span>TRACK:</span>
             <select id="bgSongSelect" class="song-dropdown" onchange="changeTrack(this.value)">
-              <option value="pani_da_rang">Pani Da Rang — Acoustic Vocal & Guitar</option>
-              <option value="mitti_di_khushboo">Mitti Di Khushboo — Acoustic Vocal & Guitar</option>
-              <option value="nazm_nazm">Nazm Nazm — Acoustic Vocal & Guitar</option>
-              <option value="saadi_galli">Saadi Galli Aaja — Acoustic Vocal & Guitar</option>
+              <option value="pani_da_rang">Pani Da Rang — Acoustic Vocal &amp; Guitar</option>
+              <option value="mitti_di_khushboo">Mitti Di Khushboo — Acoustic Vocal &amp; Guitar</option>
+              <option value="nazm_nazm">Nazm Nazm — Acoustic Vocal &amp; Guitar</option>
+              <option value="saadi_galli">Saadi Galli Aaja — Acoustic Vocal &amp; Guitar</option>
               <option value="acoustic_ballad">Session Drum Beat — 85 BPM</option>
             </select>
           </span>
 
           <button class="audio-btn primary" id="btnPlayBg" onclick="togglePlayBgSong()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             <span>Play Track</span>
           </button>
           
           <label class="audio-btn" style="cursor: pointer;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
             <span>Import MP3</span>
             <input type="file" id="userAudioFile" accept="audio/*" style="display: none;" onchange="loadUserAudioFile(event)">
           </label>
         </div>
 
+        <!-- Real hardware analog LED ladders -->
+        <div class="vu-meter-rack">
+          <div class="vu-channel">
+            <span class="vu-label">TRACK</span>
+            <div class="vu-ladder" id="bgVuLadder">
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+            </div>
+          </div>
+          <div class="vu-channel">
+            <span class="vu-label">STRUM</span>
+            <div class="vu-ladder" id="strumVuLadder">
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+              <div class="vu-led-seg"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="visualizer-wrapper">
-          <canvas id="audioVisualizer" width="140" height="24"></canvas>
+          <canvas id="audioVisualizer" width="130" height="22"></canvas>
         </div>
 
         <label class="toggle-wrapper" title="When enabled, the song plays smoothly when you are strumming in the air, and pauses if you stop!">
           <input type="checkbox" id="rockstarModeToggle" class="toggle-checkbox" checked onchange="toggleRockstarMode(this.checked)">
           <div class="toggle-switch"></div>
-          <span style="font-size: 0.82rem; font-weight: 700; color: var(--gold); letter-spacing: 0.04em;">Motion Sync</span>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--gold); letter-spacing: 0.04em; font-family: var(--font-mono);">Motion Sync</span>
         </label>
       </div>
 
       <!-- Real-time Song Scrubber & Timeline -->
       <div class="song-timeline-wrap">
-        <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; color: var(--gold);">TIMELINE</span>
+        <span style="font-size: 0.68rem; font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.08em; color: var(--gold);">TIMELINE</span>
         <div class="song-timeline-bar" id="songTimelineBar" onclick="onTimelineClick(event)">
           <div class="song-timeline-fill" id="songTimelineFill"></div>
         </div>
         <div class="song-time-readout" id="songTimeReadout">00:00 / 00:00</div>
       </div>
 
-      <div class="bg-song-row" style="font-size: 0.84rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px;">
+      <div class="bg-song-row" style="font-size: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 8px;">
         <div class="volume-slider-group">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-          <span>Vocal / Track:</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          <span>Track Vol:</span>
           <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="setBgVolume(this.value)">
         </div>
 
         <div class="volume-slider-group">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-          <span>Acoustic Strum:</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+          <span>Strum Vol:</span>
           <input type="range" id="strumVolumeSlider" min="0" max="1.5" step="0.05" value="1.0" oninput="setStrumVolume(this.value)">
         </div>
 
-        <span style="color: var(--text-muted); font-size: 0.8rem; font-family: ui-monospace, monospace;" id="bgTrackStatus">Ready · Strum in frame to drive playback</span>
+        <span style="color: var(--text-muted); font-size: 0.76rem; font-family: var(--font-mono);" id="bgTrackStatus">Ready · Strum in frame to drive playback</span>
       </div>
     </div>
 
@@ -1300,15 +1485,15 @@
     <div class="fretboard-card">
       <div class="fretboard-header">
         <div class="fretboard-title">
-          <span>ACOUSTIC FRETBOARD · CHORD VOICING</span>
+          <span>ACOUSTIC FRETBOARD · HARMONIC VOICING</span>
         </div>
         <div class="fret-finger-legend">
           <div class="legend-item"><span class="finger-dot" style="background: var(--finger-1);">1</span> Index</div>
           <div class="legend-item"><span class="finger-dot" style="background: var(--finger-2);">2</span> Middle</div>
           <div class="legend-item"><span class="finger-dot" style="background: var(--finger-3);">3</span> Ring</div>
           <div class="legend-item"><span class="finger-dot" style="background: var(--finger-4);">4</span> Pinky</div>
-          <div class="legend-item"><span style="color: #22c55e; font-weight: 800;">O</span> Open</div>
-          <div class="legend-item"><span style="color: #ef4444; font-weight: 800;">×</span> Mute</div>
+          <div class="legend-item"><span style="color: #22c55e; font-weight: 800; font-family: var(--font-mono);">O</span> Open</div>
+          <div class="legend-item"><span style="color: #ef4444; font-weight: 800; font-family: var(--font-mono);">×</span> Mute</div>
         </div>
       </div>
 
@@ -1317,21 +1502,21 @@
       </div>
 
       <div class="fretboard-hint-row">
-        <span style="color: var(--gold); font-size: 0.78rem;">Note Audition: Click any string on the fretboard to pluck that individual note</span>
-        <span style="color: var(--text-muted); font-size: 0.78rem; font-family: ui-monospace, monospace;">Frets 1 – 4 · Standard EADGBe Tuning</span>
+        <span style="color: var(--gold); font-size: 0.76rem;">Click any string to pluck individual acoustic note</span>
+        <span style="color: var(--text-muted); font-size: 0.74rem; font-family: var(--font-mono);">Frets 1 – 4 · Standard EADGBe Tuning</span>
       </div>
 
       <div class="chord-instruction">
-        <span style="font-weight: 700; color: #ffffff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Placement Guide:</span>
+        <span style="font-weight: 700; color: #ffffff; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-mono);">Placement Guide:</span>
         <div class="finger-steps" id="hudFingerSteps"></div>
       </div>
     </div>
 
-    <!-- CHORD SELECTOR PANEL (MPC PADS) -->
+    <!-- CHORD SELECTOR PANEL (MPC SILICONE PADS) -->
     <div class="controls-panel">
       <div class="panel-header-row">
-        <span class="panel-label">CHORD PADS</span>
-        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: ui-monospace, monospace;">Keys [1]–[9] to switch, [Space] to strum</span>
+        <span class="panel-label">CHORD PADS · SILICONE MATRIX</span>
+        <span style="font-size: 0.74rem; color: var(--text-muted); font-family: var(--font-mono);">Keys [1]–[9] to trigger · [Space] to strum</span>
       </div>
 
       <div class="chord-grid">
@@ -1403,19 +1588,19 @@
       </div>
     </div>
 
-    <!-- Quick Guide -->
+    <!-- Quick Performance Guide -->
     <div class="guide-cards">
       <div class="guide-card">
-        <strong>1. Hand Strum Tracking</strong>
-        Move your strumming hand down or up in camera frame to trigger acoustic steel strings with responsive velocity.
+        <strong><span class="guide-step-num">01</span> Hand Strum Tracking</strong>
+        Move your hand down or up across the frame to trigger acoustic steel strings with responsive velocity dynamics.
       </div>
       <div class="guide-card">
-        <strong>2. Vocal & Guitar Harmony</strong>
-        Studio backing vocals and acoustic tracks synchronize dynamically with your strum dynamics and rhythm.
+        <strong><span class="guide-step-num">02</span> Studio Harmonic Harmony</strong>
+        Backing tracks and acoustic vocals synchronize dynamically with your strum dynamics and rhythm.
       </div>
       <div class="guide-card">
-        <strong>3. Exact Finger Placement</strong>
-        The rosewood fretboard visualizes the exact strings and frets to press for each harmonic voicing in real-time.
+        <strong><span class="guide-step-num">03</span> Physical Fretboard Voicings</strong>
+        The rosewood fretboard visualizes the physical strings and frets to press for each harmonic chord in real time.
       </div>
     </div>
   </div>
@@ -1424,7 +1609,7 @@
   <div class="modal-overlay" id="shortcutsModal" onclick="closeShortcutsModal(event)">
     <div class="modal-dialog" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div class="modal-title">Keyboard & Vision Shortcuts</div>
+        <div class="modal-title">Studio Keyboard Shortcuts</div>
         <button class="modal-close-btn" onclick="closeShortcutsModal()">×</button>
       </div>
       <div class="shortcut-row"><span>Select Chords (C, G, D, Em, Am, E, A, F, Dm)</span><span class="shortcut-key-badge">1 – 9</span></div>
@@ -1436,7 +1621,7 @@
     </div>
   </div>
 
-  <script>
+<script>
     /* ==========================================================================
        GLOBAL VARIABLES & STATE (Hoisted safely to prevent TDZ errors)
        ========================================================================== */
@@ -1996,7 +2181,7 @@
       const chord = CHORD_LIBRARY[activeChordKey] || CHORD_LIBRARY['Em'];
       const stringGauges = [3.6, 2.9, 2.3, 1.8, 1.4, 1.0];
 
-      // Draw 6 Strings with vibration physics and metallic shaders
+      // Draw 6 Strings with vibration physics, wound bronze coils & steel shaders
       for (let s = 0; s < 6; s++) {
         const vib = (stringVibrations[s] || 0) * Math.sin(performance.now() * 0.06 + s) * 3.5;
         if (stringVibrations[s] > 0.01) {
@@ -2005,8 +2190,8 @@
 
         const sy = topMargin + s * stringSpacing;
 
-        fCtx.fillStyle = "#8a8a8a";
-        fCtx.font = "bold 11px monospace";
+        fCtx.fillStyle = "#888888";
+        fCtx.font = "bold 11px 'JetBrains Mono', monospace";
         fCtx.textAlign = "left";
         fCtx.fillText(STRING_NAMES[s], 8, sy + 4);
 
@@ -2266,7 +2451,7 @@
           ctx.drawImage(webcamElement, 0, 0, w, h);
         }
       } else {
-        ctx.fillStyle = "#07090e";
+        ctx.fillStyle = "#080808";
         ctx.fillRect(0, 0, w, h);
       }
       ctx.restore();
@@ -2351,6 +2536,10 @@
 
         const isAudioActive = (songPlayer && songPlayer.isPlaying) || (performance.now() - lastStrumTime < 1400);
 
+        // Dark chassis background for spectrum analyzer
+        visCtx.fillStyle = "#0a0a0a";
+        visCtx.fillRect(0, 0, vw, vh);
+
         for (let b = 0; b < numBars; b++) {
           let barH = 3;
           if (isAudioActive) {
@@ -2361,12 +2550,13 @@
           const bx = startX + b * (barWidth + barGap);
           const by = vh - barH;
 
-          const grad = visCtx.createLinearGradient(0, vh, 0, 0);
-          grad.addColorStop(0, "rgba(245, 158, 11, 0.5)");
-          grad.addColorStop(1, "rgba(254, 240, 138, 0.95)");
-
-          visCtx.fillStyle = grad;
+          // Warm amber studio LED bar
+          visCtx.fillStyle = "#d97706";
           visCtx.fillRect(bx, by, barWidth, barH);
+
+          // Precision peak hold cap
+          visCtx.fillStyle = "#fde68a";
+          visCtx.fillRect(bx, Math.max(0, by - 2), barWidth, 1.5);
         }
       }
 

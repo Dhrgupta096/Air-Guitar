@@ -1723,6 +1723,87 @@
       height: 4px;
       background: linear-gradient(to top, rgba(18, 18, 18, 0.95), transparent);
     }
+
+  /* REACT BITS: ELASTIC SLIDER STYLES */
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 14rem;
+  position: relative;
+}
+
+.slider-wrapper {
+  display: flex;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.slider-root {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 180px;
+  flex-grow: 1;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.slider-root:active {
+  cursor: grabbing;
+}
+
+.slider-track-wrapper {
+  display: flex;
+  flex-grow: 1;
+  height: 6px;
+  transform-origin: center;
+}
+
+.slider-track {
+  position: relative;
+  height: 100%;
+  flex-grow: 1;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.slider-range {
+  position: absolute;
+  height: 100%;
+  background-color: #f59e0b;
+  border-radius: 9999px;
+  transition: background-color 0.15s ease;
+}
+
+.slider-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888888;
+  cursor: pointer;
+}
+
+.value-indicator {
+  color: #888888;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
   </style>
 </head>
 <body>
@@ -1993,16 +2074,34 @@
       </div>
 
       <div class="bg-song-row" style="font-size: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 8px;">
-        <div class="volume-slider-group">
+        <!-- React Bits: ElasticSlider for Track Volume -->
+        <div class="volume-slider-group" id="elasticTrackVolWrapper">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
           <span>Track Vol:</span>
-          <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="setBgVolume(this.value)">
+          <div class="slider-root" id="elasticTrackVolRoot" style="width: 110px; max-width: 110px; padding: 4px 0;">
+            <div class="slider-track-wrapper" id="elasticTrackVolWrapperInner">
+              <div class="slider-track">
+                <div class="slider-range" id="elasticTrackVolRange" style="width: 80%;"></div>
+              </div>
+            </div>
+          </div>
+          <span class="value-indicator" id="elasticTrackVolValue">80%</span>
+          <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.8" style="display: none;" oninput="setBgVolume(this.value)">
         </div>
 
-        <div class="volume-slider-group">
+        <!-- React Bits: ElasticSlider for Strum Volume -->
+        <div class="volume-slider-group" id="elasticStrumVolWrapper">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
           <span>Strum Vol:</span>
-          <input type="range" id="strumVolumeSlider" min="0" max="1.5" step="0.05" value="1.0" oninput="setStrumVolume(this.value)">
+          <div class="slider-root" id="elasticStrumVolRoot" style="width: 110px; max-width: 110px; padding: 4px 0;">
+            <div class="slider-track-wrapper" id="elasticStrumVolWrapperInner">
+              <div class="slider-track">
+                <div class="slider-range" id="elasticStrumVolRange" style="width: 67%;"></div>
+              </div>
+            </div>
+          </div>
+          <span class="value-indicator" id="elasticStrumVolValue">100%</span>
+          <input type="range" id="strumVolumeSlider" min="0" max="1.5" step="0.05" value="1.0" style="display: none;" oninput="setStrumVolume(this.value)">
         </div>
 
         <span style="color: var(--text-muted); font-size: 0.76rem; font-family: var(--font-mono);" id="bgTrackStatus">Ready · Strum in frame to drive playback</span>
@@ -2206,6 +2305,151 @@
     /* ==========================================================================
        REACT BITS: OPTION WHEEL ENGINE
        ========================================================================== */
+    /* ==========================================================================
+       REACT BITS: ELASTIC SLIDER ENGINE
+       ========================================================================== */
+    class ElasticSliderDOM {
+      constructor(rootEl, options = {}) {
+        this.root = rootEl;
+        this.min = options.min || 0;
+        this.max = options.max || 100;
+        this.val = options.defaultValue || 50;
+        this.onChange = options.onChange;
+        this.rangeEl = rootEl.querySelector('.slider-range');
+        this.wrapperEl = rootEl.querySelector('.slider-track-wrapper');
+        this.indicatorEl = options.indicatorEl;
+        this.maxOverflow = 40;
+        this.overflow = 0;
+        this.isDragging = false;
+        this.springRaf = null;
+
+        this.init();
+      }
+
+      init() {
+        this.updateVisuals();
+
+        this.root.addEventListener('pointerdown', (e) => {
+          this.isDragging = true;
+          this.root.setPointerCapture(e.pointerId);
+          this.handleMove(e);
+        });
+
+        this.root.addEventListener('pointermove', (e) => {
+          if (this.isDragging) {
+            this.handleMove(e);
+          }
+        });
+
+        const onEnd = () => {
+          if (!this.isDragging) return;
+          this.isDragging = false;
+          this.releaseSpring();
+        };
+
+        this.root.addEventListener('pointerup', onEnd);
+        this.root.addEventListener('pointercancel', onEnd);
+      }
+
+      handleMove(e) {
+        const rect = this.root.getBoundingClientRect();
+        const clientX = e.clientX;
+        let pct = (clientX - rect.left) / rect.width;
+        let rawVal = this.min + pct * (this.max - this.min);
+
+        // Boundary overflow decay
+        let overflowDelta = 0;
+        if (clientX < rect.left) {
+          overflowDelta = rect.left - clientX;
+          this.wrapperEl.style.transformOrigin = 'right center';
+        } else if (clientX > rect.right) {
+          overflowDelta = clientX - rect.right;
+          this.wrapperEl.style.transformOrigin = 'left center';
+        } else {
+          this.wrapperEl.style.transformOrigin = 'center';
+        }
+
+        const entry = overflowDelta / this.maxOverflow;
+        const sigmoid = 2 * (1 / (1 + Math.exp(-entry)) - 0.5);
+        this.overflow = sigmoid * this.maxOverflow;
+
+        this.val = Math.max(this.min, Math.min(this.max, rawVal));
+        this.updateVisuals();
+        if (this.onChange) this.onChange(this.val);
+      }
+
+      updateVisuals() {
+        const pct = Math.max(0, Math.min(100, ((this.val - this.min) / (this.max - this.min)) * 100));
+        if (this.rangeEl) this.rangeEl.style.width = pct + '%';
+        if (this.indicatorEl) this.indicatorEl.textContent = Math.round(pct) + '%';
+
+        if (this.wrapperEl) {
+          const width = this.root.clientWidth || 100;
+          const scaleX = 1 + this.overflow / width;
+          const scaleY = Math.max(0.7, 1 - (this.overflow / this.maxOverflow) * 0.3);
+          this.wrapperEl.style.transform = `scale(${scaleX}, ${scaleY})`;
+        }
+      }
+
+      releaseSpring() {
+        const startTime = performance.now();
+        const startOverflow = this.overflow;
+        if (this.springRaf) cancelAnimationFrame(this.springRaf);
+
+        const animateSpring = (time) => {
+          const elapsed = (time - startTime) / 1000;
+          // Spring oscillation formula
+          const freq = 18;
+          const damping = 12;
+          const decayVal = Math.exp(-damping * elapsed) * Math.cos(freq * elapsed);
+          this.overflow = startOverflow * decayVal;
+
+          if (elapsed > 0.4 || Math.abs(this.overflow) < 0.2) {
+            this.overflow = 0;
+            this.updateVisuals();
+            this.springRaf = null;
+          } else {
+            this.updateVisuals();
+            this.springRaf = requestAnimationFrame(animateSpring);
+          }
+        };
+
+        this.springRaf = requestAnimationFrame(animateSpring);
+      }
+    }
+
+    function initElasticSliders() {
+      const trackRoot = document.getElementById('elasticTrackVolRoot');
+      const trackVal = document.getElementById('elasticTrackVolValue');
+      if (trackRoot) {
+        new ElasticSliderDOM(trackRoot, {
+          min: 0,
+          max: 1,
+          defaultValue: 0.8,
+          indicatorEl: trackVal,
+          onChange: (v) => {
+            if (bgVolumeSlider) bgVolumeSlider.value = v;
+            setBgVolume(v);
+          }
+        });
+      }
+
+      const strumRoot = document.getElementById('elasticStrumVolRoot');
+      const strumVal = document.getElementById('elasticStrumVolValue');
+      if (strumRoot) {
+        new ElasticSliderDOM(strumRoot, {
+          min: 0,
+          max: 1.5,
+          defaultValue: 1.0,
+          indicatorEl: strumVal,
+          onChange: (v) => {
+            if (strumVolumeSlider) strumVolumeSlider.value = v;
+            setStrumVolume(v);
+          }
+        });
+      }
+    }
+
     /* ==========================================================================
        REACT BITS: ROLLING MECHANICAL COUNTER CONTROLLER
        ========================================================================== */
@@ -3278,6 +3522,7 @@
         const vinylDisc = document.getElementById('vinylDisc');
       initTrackOptionWheel();
       initClickSpark();
+      initElasticSliders();
         if (vinylDisc) vinylDisc.classList.add('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "NOW PLAYING";
@@ -3292,6 +3537,7 @@
         const vinylDisc = document.getElementById('vinylDisc');
       initTrackOptionWheel();
       initClickSpark();
+      initElasticSliders();
         if (vinylDisc) vinylDisc.classList.remove('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "PAUSED";
@@ -4197,6 +4443,7 @@
       const vinylDisc = document.getElementById('vinylDisc');
       initTrackOptionWheel();
       initClickSpark();
+      initElasticSliders();
       if (vinylDisc) vinylDisc.classList.add('spinning');
       const vinylTitle = document.getElementById('vinylTrackTitle');
       if (vinylTitle) vinylTitle.textContent = file.name;

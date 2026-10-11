@@ -1661,6 +1661,68 @@
   display: block;
 }
 
+
+    /* REACT BITS: COUNTER STYLES */
+    .counter-container {
+      position: relative;
+      display: inline-flex;
+      overflow: hidden;
+      vertical-align: middle;
+      height: 1.2em;
+      line-height: 1.2;
+    }
+    .counter-counter {
+      display: inline-flex;
+      overflow: hidden;
+      gap: 1px;
+    }
+    .counter-digit {
+      position: relative;
+      width: 0.88ch;
+      height: 1.2em;
+      overflow: hidden;
+      font-variant-numeric: tabular-nums;
+      display: inline-block;
+    }
+    .counter-strip {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .counter-num {
+      height: 1.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .counter-container .gradient-container {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+    }
+    .counter-container .top-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to bottom, rgba(18, 18, 18, 0.95), transparent);
+    }
+    .counter-container .bottom-gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to top, rgba(18, 18, 18, 0.95), transparent);
+    }
   </style>
 </head>
 <body>
@@ -1774,7 +1836,19 @@
             <span id="trackingText" style="font-size: 0.74rem; font-weight: 700; font-family: var(--font-mono);">Standby</span>
             <span style="color: rgba(255,255,255,0.25);">|</span>
             <span class="metric-title">STRUMS</span>
-            <span class="metric-value" id="hudTotalStrums">0</span>
+            <span class="metric-value" id="hudTotalStrums">
+              <span class="counter-container">
+                <span class="counter-counter">
+                  <span class="counter-digit" data-place="100"><span class="counter-strip" id="counterStrip100"><span class="counter-num">0</span><span class="counter-num">1</span><span class="counter-num">2</span><span class="counter-num">3</span><span class="counter-num">4</span><span class="counter-num">5</span><span class="counter-num">6</span><span class="counter-num">7</span><span class="counter-num">8</span><span class="counter-num">9</span></span></span>
+                  <span class="counter-digit" data-place="10"><span class="counter-strip" id="counterStrip10"><span class="counter-num">0</span><span class="counter-num">1</span><span class="counter-num">2</span><span class="counter-num">3</span><span class="counter-num">4</span><span class="counter-num">5</span><span class="counter-num">6</span><span class="counter-num">7</span><span class="counter-num">8</span><span class="counter-num">9</span></span></span>
+                  <span class="counter-digit" data-place="1"><span class="counter-strip" id="counterStrip1"><span class="counter-num">0</span><span class="counter-num">1</span><span class="counter-num">2</span><span class="counter-num">3</span><span class="counter-num">4</span><span class="counter-num">5</span><span class="counter-num">6</span><span class="counter-num">7</span><span class="counter-num">8</span><span class="counter-num">9</span></span></span>
+                </span>
+                <span class="gradient-container">
+                  <span class="top-gradient"></span>
+                  <span class="bottom-gradient"></span>
+                </span>
+              </span>
+            </span>
             <span id="hudActingStatus" style="display: none;">Ready to Strum</span>
           </div>
         </div>
@@ -2132,6 +2206,24 @@
     /* ==========================================================================
        REACT BITS: OPTION WHEEL ENGINE
        ========================================================================== */
+    /* ==========================================================================
+       REACT BITS: ROLLING MECHANICAL COUNTER CONTROLLER
+       ========================================================================== */
+    function updateRollingCounter(val) {
+      const s100 = document.getElementById('counterStrip100');
+      const s10 = document.getElementById('counterStrip10');
+      const s1 = document.getElementById('counterStrip1');
+      if (!s1) return;
+
+      const d100 = Math.floor(val / 100) % 10;
+      const d10 = Math.floor(val / 10) % 10;
+      const d1 = val % 10;
+
+      if (s100) s100.style.transform = `translateY(-${d100 * 1.2}em)`;
+      if (s10) s10.style.transform = `translateY(-${d10 * 1.2}em)`;
+      if (s1) s1.style.transform = `translateY(-${d1 * 1.2}em)`;
+    }
+
     /* ==========================================================================
        REACT BITS: CRT WARP SHADER CONTROLLER
        ========================================================================== */
@@ -3891,7 +3983,7 @@
       }
 
       totalStrums++;
-      if (hudTotalStrums) hudTotalStrums.textContent = totalStrums;
+      if (hudTotalStrums) updateRollingCounter(totalStrums);
       if (hudActingStatus) hudActingStatus.textContent = downstroke ? "DOWNSTROKE" : "UPSTROKE";
 
       // Update Center Velocity Gauge HUD

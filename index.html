@@ -1267,6 +1267,87 @@
       color: var(--gold);
       font-size: 0.78rem;
     }
+
+    /* REACT BITS: OPTION WHEEL STYLES */
+    .wheel-strip-container {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .wheel-strip-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .wheel-strip-title {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .wheel-strip-hint {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .option-wheel-viewport {
+      --ow-text-color: #737373;
+      --ow-active-color: #f59e0b;
+      --ow-font-size: 1.15rem;
+      --ow-inset: 20px;
+
+      position: relative;
+      width: 100%;
+      height: 105px;
+      background: #090909;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      outline: none;
+    }
+
+    .option-wheel-viewport.option-wheel--dragging {
+      cursor: grabbing;
+    }
+
+    .option-wheel__item {
+      position: absolute;
+      top: 50%;
+      left: var(--ow-inset);
+      white-space: nowrap;
+      font-size: var(--ow-font-size);
+      line-height: 1;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      letter-spacing: -0.01em;
+      transform-origin: left center;
+      cursor: pointer;
+      will-change: transform, opacity, filter;
+      color: color-mix(in srgb, var(--ow-active-color) calc(var(--ow-p, 0) * 100%), var(--ow-text-color));
+      transition: color 0.1s ease;
+    }
+
+    .option-wheel__item--selected {
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -1453,6 +1534,18 @@
           <div class="toggle-switch"></div>
           <span style="font-size: 0.78rem; font-weight: 700; color: var(--gold); letter-spacing: 0.04em; font-family: var(--font-mono);">Motion Sync</span>
         </label>
+      </div>
+
+      <!-- 3D Interactive React Bits OptionWheel Track Selector -->
+      <div class="wheel-strip-container" id="wheelStripContainer">
+        <div class="wheel-strip-header">
+          <div class="wheel-strip-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10M12 22a10 10 0 0 1-10-10"></path></svg>
+            <span>REACT BITS · OPTION WHEEL TRACK SELECTOR</span>
+          </div>
+          <span class="wheel-strip-hint">Scroll wheel · Drag up/down · Arrow keys [↑/↓]</span>
+        </div>
+        <div class="option-wheel-viewport" id="trackOptionWheel"></div>
       </div>
 
       <!-- Real-time Song Scrubber & Timeline -->
@@ -1674,6 +1767,271 @@
     var songProgressionIndex = 0;
     var guitarAudio = null;
     var songPlayer = null;
+
+    /* ==========================================================================
+       REACT BITS: OPTION WHEEL ENGINE
+       ========================================================================== */
+    var trackOptionWheelInstance = null;
+
+    class OptionWheel {
+      constructor(container, options = {}) {
+        this.container = container;
+        this.items = options.items || [];
+        this.defaultSelected = options.defaultSelected || 0;
+        this.onChange = options.onChange;
+        this.textColor = options.textColor || '#737373';
+        this.activeColor = options.activeColor || '#f59e0b';
+        this.side = options.side || 'left';
+        this.fontSize = options.fontSize || 1.15;
+        this.spacing = options.spacing || 1.45;
+        this.curve = options.curve !== undefined ? options.curve : 1;
+        this.tilt = options.tilt !== undefined ? options.tilt : 6;
+        this.blur = options.blur !== undefined ? options.blur : 2;
+        this.fade = options.fade !== undefined ? options.fade : 0.25;
+        this.minOpacity = options.minOpacity !== undefined ? options.minOpacity : 0.05;
+        this.smoothing = options.smoothing || 200;
+        this.inset = options.inset !== undefined ? options.inset : 20;
+        this.loop = !!options.loop;
+        this.draggable = options.draggable !== undefined ? options.draggable : true;
+
+        this.pos = this.defaultSelected;
+        this.target = this.defaultSelected;
+        this.selected = this.defaultSelected;
+        this.lastTime = 0;
+        this.raf = null;
+        this.wheelTimer = null;
+        this.drag = null;
+        this.dragMoved = false;
+        this.lastTick = 0;
+
+        this.initDOM();
+        this.bindEvents();
+        this.applyTarget(this.defaultSelected, true);
+      }
+
+      initDOM() {
+        this.container.innerHTML = '';
+        this.container.setAttribute('role', 'listbox');
+        this.container.setAttribute('tabindex', '0');
+        this.container.setAttribute('aria-label', 'Option wheel');
+        this.container.classList.add('option-wheel');
+        if (this.side === 'right') this.container.classList.add('option-wheel--right');
+
+        this.container.style.setProperty('--ow-text-color', this.textColor);
+        this.container.style.setProperty('--ow-active-color', this.activeColor);
+        this.container.style.setProperty('--ow-font-size', `${this.fontSize}rem`);
+        this.container.style.setProperty('--ow-inset', `${this.inset}px`);
+
+        this.itemEls = [];
+        this.items.forEach((label, idx) => {
+          const el = document.createElement('div');
+          el.className = 'option-wheel__item';
+          el.setAttribute('role', 'option');
+          el.textContent = label;
+          el.addEventListener('click', () => {
+            if (this.dragMoved) return;
+            this.handleItemClick(idx);
+          });
+          this.container.appendChild(el);
+          this.itemEls.push(el);
+        });
+      }
+
+      getRowHeight() {
+        const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        return Math.max(this.fontSize * this.spacing * remPx, 1);
+      }
+
+      runFrame(now) {
+        const dt = Math.min((now - this.lastTime) / 1000, 0.05);
+        this.lastTime = now;
+        const tau = Math.max(this.smoothing, 1) / 1000;
+        const k = 1 - Math.exp(-dt / tau);
+
+        const target = this.target;
+        const cur = this.pos;
+        let next = cur + (target - cur) * k;
+        const settled = Math.abs(target - next) < 0.001;
+        if (settled) next = target;
+        this.pos = next;
+
+        const rowH = this.getRowHeight();
+        const n = this.items.length;
+        const mirror = this.side === 'right' ? -1 : 1;
+        const tiltRad = (this.tilt * Math.PI) / 180;
+        const R = tiltRad > 0.0005 ? rowH / tiltRad : 0;
+
+        for (let i = 0; i < n; i++) {
+          const el = this.itemEls[i];
+          if (!el) continue;
+          let d = i - next;
+          if (this.loop && n > 1) {
+            d = ((d % n) + n) % n;
+            if (d > n / 2) d -= n;
+          }
+          const dist = Math.abs(d);
+          let x = 0;
+          let y = d * rowH;
+          let rot = 0;
+          if (R > 0) {
+            const ang = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, d * tiltRad));
+            y = R * Math.sin(ang);
+            x = -mirror * R * (1 - Math.cos(ang)) * this.curve;
+            rot = (mirror * ang * 180) / Math.PI;
+          }
+          el.style.transform = `translate(${x.toFixed(2)}px, calc(${y.toFixed(2)}px - 50%)) rotate(${rot.toFixed(3)}deg)`;
+          el.style.opacity = String(Math.max(this.minOpacity, 1 - dist * this.fade));
+          el.style.filter = this.blur > 0 ? `blur(${(dist * this.blur).toFixed(2)}px)` : 'none';
+          el.style.setProperty('--ow-p', Math.max(0, 1 - Math.min(dist, 1)).toFixed(4));
+        }
+
+        if (!settled) {
+          this.raf = requestAnimationFrame(t => this.runFrame(t));
+        } else {
+          this.raf = null;
+        }
+      }
+
+      startLoop() {
+        if (this.raf != null) cancelAnimationFrame(this.raf);
+        this.lastTime = performance.now();
+        this.raf = requestAnimationFrame(t => this.runFrame(t));
+      }
+
+      playTick() {
+        const now = performance.now();
+        if (now - this.lastTick < 70) return;
+        this.lastTick = now;
+        if (guitarAudio && guitarAudio.playUiClick) {
+          guitarAudio.playUiClick(1200);
+        }
+      }
+
+      applyTarget(value, snap) {
+        const n = this.items.length;
+        let v = value;
+        if (!this.loop) v = Math.min(Math.max(v, 0), Math.max(n - 1, 0));
+        if (snap) v = Math.round(v);
+        this.target = v;
+        const idx = ((Math.round(v) % n) + n) % n;
+        if (idx !== this.selected) {
+          this.selected = idx;
+          this.itemEls.forEach((el, i) => {
+            el.classList.toggle('option-wheel__item--selected', i === idx);
+            el.setAttribute('aria-selected', i === idx);
+          });
+          if (this.onChange) this.onChange(idx, this.items[idx]);
+          this.playTick();
+        }
+        this.startLoop();
+      }
+
+      handleItemClick(idx) {
+        const n = this.items.length;
+        const cur = this.target;
+        let d = idx - (((cur % n) + n) % n);
+        if (this.loop && n > 1) {
+          if (d > n / 2) d -= n;
+          else if (d < -n / 2) d += n;
+        }
+        this.applyTarget(cur + d, true);
+      }
+
+      setIndex(idx) {
+        if (idx >= 0 && idx < this.items.length) {
+          this.applyTarget(idx, true);
+        }
+      }
+
+      bindEvents() {
+        const el = this.container;
+        el.addEventListener('wheel', e => {
+          e.preventDefault();
+          const rowH = this.getRowHeight();
+          const delta = e.deltaMode === 1 ? e.deltaY * 24 : e.deltaY;
+          const step = Math.max(-1, Math.min(1, delta / rowH));
+          this.applyTarget(this.target + step, false);
+          if (this.wheelTimer) clearTimeout(this.wheelTimer);
+          this.wheelTimer = setTimeout(() => this.applyTarget(this.target, true), 140);
+        }, { passive: false });
+
+        el.addEventListener('pointerdown', e => {
+          if (!this.draggable) return;
+          this.drag = { y: e.clientY, start: this.target, id: e.pointerId };
+          this.dragMoved = false;
+          el.classList.add('option-wheel--dragging');
+        });
+
+        el.addEventListener('pointermove', e => {
+          if (!this.drag) return;
+          const dy = e.clientY - this.drag.y;
+          if (!this.dragMoved && Math.abs(dy) > 4) {
+            this.dragMoved = true;
+            el.setPointerCapture(this.drag.id);
+          }
+          if (this.dragMoved) {
+            const rowH = this.getRowHeight();
+            this.applyTarget(this.drag.start - dy / rowH, false);
+          }
+        });
+
+        const onEnd = () => {
+          if (!this.drag) return;
+          this.drag = null;
+          el.classList.remove('option-wheel--dragging');
+          if (this.dragMoved) this.applyTarget(this.target, true);
+        };
+
+        el.addEventListener('pointerup', onEnd);
+        el.addEventListener('pointercancel', onEnd);
+
+        el.addEventListener('keydown', e => {
+          let delta = null;
+          if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') delta = -1;
+          else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') delta = 1;
+          if (delta == null) return;
+          e.preventDefault();
+          this.applyTarget(Math.round(this.target) + delta, true);
+        });
+      }
+    }
+
+    function initTrackOptionWheel() {
+      const wheelContainer = document.getElementById('trackOptionWheel');
+      if (!wheelContainer) return;
+      const trackKeys = ['pani_da_rang', 'mitti_di_khushboo', 'nazm_nazm', 'saadi_galli', 'acoustic_ballad'];
+      const trackLabels = [
+        'Pani Da Rang — Acoustic Vocal',
+        'Mitti Di Khushboo — Acoustic Vocal',
+        'Nazm Nazm — Acoustic Vocal',
+        'Saadi Galli Aaja — Acoustic Vocal',
+        'Session Drum Beat — 85 BPM'
+      ];
+      trackOptionWheelInstance = new OptionWheel(wheelContainer, {
+        items: trackLabels,
+        defaultSelected: 0,
+        textColor: '#737373',
+        activeColor: '#f59e0b',
+        side: 'left',
+        fontSize: 1.15,
+        spacing: 1.45,
+        curve: 1,
+        tilt: 6,
+        blur: 1.8,
+        fade: 0.28,
+        smoothing: 180,
+        inset: 20,
+        loop: false,
+        draggable: true,
+        onChange: (idx) => {
+          const selectedKey = trackKeys[idx];
+          if (bgSongSelect && bgSongSelect.value !== selectedKey) {
+            bgSongSelect.value = selectedKey;
+            changeTrack(selectedKey, false);
+          }
+        }
+      });
+    }
 
     function initDomReferences() {
       webcamElement = document.getElementById('webcam');
@@ -1980,6 +2338,7 @@
         this.isPlaying = true;
 
         const vinylDisc = document.getElementById('vinylDisc');
+      initTrackOptionWheel();
         if (vinylDisc) vinylDisc.classList.add('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "NOW PLAYING";
@@ -1992,6 +2351,7 @@
         this.isPlaying = false;
 
         const vinylDisc = document.getElementById('vinylDisc');
+      initTrackOptionWheel();
         if (vinylDisc) vinylDisc.classList.remove('spinning');
         const vinylStatus = document.getElementById('vinylTrackStatus');
         if (vinylStatus) vinylStatus.textContent = "PAUSED";
@@ -2892,6 +3252,7 @@
       if (btnPlayBg) btnPlayBg.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> <span>Pause Track</span>';
 
       const vinylDisc = document.getElementById('vinylDisc');
+      initTrackOptionWheel();
       if (vinylDisc) vinylDisc.classList.add('spinning');
       const vinylTitle = document.getElementById('vinylTrackTitle');
       if (vinylTitle) vinylTitle.textContent = file.name;

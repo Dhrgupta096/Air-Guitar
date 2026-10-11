@@ -687,6 +687,218 @@
       cursor: pointer;
     }
 
+    /* ANALOG LED VU LADDER METERS */
+    .vu-meter-ladder {
+      display: inline-flex;
+      align-items: center;
+      gap: 2.5px;
+      height: 14px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 5px;
+      padding: 2px 4px;
+    }
+
+    .vu-led-seg {
+      width: 4px;
+      height: 10px;
+      border-radius: 1.5px;
+      background: rgba(255, 255, 255, 0.08);
+      transition: background 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .vu-led-seg.lit-green {
+      background: #22c55e;
+      box-shadow: 0 0 5px rgba(34, 197, 94, 0.8);
+    }
+
+    .vu-led-seg.lit-yellow {
+      background: #eab308;
+      box-shadow: 0 0 5px rgba(234, 179, 8, 0.8);
+    }
+
+    .vu-led-seg.lit-red {
+      background: #ef4444;
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.9);
+    }
+
+    /* VINYL / CASSETTE DECK WIDGET */
+    .vinyl-widget {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 5px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .vinyl-disc-outer {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #292524 15%, #0f1422 16%, #1e293b 40%, #090d16 70%, #000000 100%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .vinyl-grooves {
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.5), inset 0 0 0 6px rgba(255, 255, 255, 0.05);
+    }
+
+    .vinyl-center-label {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+      z-index: 2;
+    }
+
+    .vinyl-center-hole {
+      width: 4px;
+      height: 4px;
+      background: #000;
+      border-radius: 50%;
+    }
+
+    .vinyl-disc-outer.spinning {
+      animation: spinVinyl 2.6s linear infinite;
+    }
+
+    @keyframes spinVinyl {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .vinyl-track-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 110px;
+    }
+
+    .vinyl-track-now {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+
+    .vinyl-track-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+
+    /* SONG TIMELINE SCRUBBER */
+    .song-timeline-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 7px 14px;
+    }
+
+    .song-timeline-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .song-timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+      transition: width 0.1s linear;
+    }
+
+    .song-time-readout {
+      font-size: 0.78rem;
+      font-family: ui-monospace, monospace;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      min-width: 90px;
+      text-align: right;
+    }
+
+    /* SONG PROGRESSION QUICK CHIPS */
+    .progression-chips-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .prog-chip-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--gold);
+      margin-right: 4px;
+    }
+
+    .prog-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .prog-chip:hover {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--border-active);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .prog-chip.active {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+    }
+
     /* REAL GUITAR FRETBOARD INTERACTIVE PANEL */
     .fretboard-card {
       background: var(--card-bg);
@@ -1098,9 +1310,23 @@
     <!-- BACKGROUND VOCALS & SONG CONTROLS (STUDIO MIXER DECK) -->
     <div class="bg-song-card">
       <div class="bg-song-row">
+        <!-- Vinyl Turntable Widget -->
+        <div class="vinyl-widget">
+          <div class="vinyl-disc-outer" id="vinylDisc">
+            <div class="vinyl-grooves"></div>
+            <div class="vinyl-center-label">
+              <div class="vinyl-center-hole"></div>
+            </div>
+          </div>
+          <div class="vinyl-track-info">
+            <span class="vinyl-track-now" id="vinylTrackStatus">Now Playing</span>
+            <span class="vinyl-track-title" id="vinylTrackTitle">Pani Da Rang</span>
+          </div>
+        </div>
+
         <div class="song-deck-header">
           <span class="song-title-label">
-            <span>🎤 Vocal & Guitar Track:</span>
+            <span>🎤 Vocal & Guitar:</span>
             <select id="bgSongSelect" class="song-dropdown" onchange="changeTrack(this.value)">
               <option value="pani_da_rang">🌟 Pani Da Rang (Acoustic Vocal + Guitar)</option>
               <option value="mitti_di_khushboo">🌾 Mitti Di Khushboo (Acoustic Vocal + Guitar)</option>
@@ -1129,17 +1355,46 @@
         </label>
       </div>
 
+      <!-- Real-time Song Scrubber & Timeline -->
+      <div class="song-timeline-wrap">
+        <span style="font-size: 0.76rem; font-weight: 700; color: var(--gold);">PROGRESS</span>
+        <div class="song-timeline-bar" id="songTimelineBar" onclick="onTimelineClick(event)">
+          <div class="song-timeline-fill" id="songTimelineFill"></div>
+        </div>
+        <div class="song-time-readout" id="songTimeReadout">00:00 / 00:00</div>
+      </div>
+
       <div class="bg-song-row" style="font-size: 0.84rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px;">
         <div class="volume-slider-group">
           <span class="vol-icon">🎤</span>
           <span>Song / Vocal Vol:</span>
           <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="setBgVolume(this.value)">
+          <div class="vu-meter-ladder" id="bgVuLadder" title="Song Output VU Peak">
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+          </div>
         </div>
 
         <div class="volume-slider-group">
           <span class="vol-icon">🎸</span>
           <span>Your Air Strum Vol:</span>
           <input type="range" id="strumVolumeSlider" min="0" max="1.5" step="0.05" value="1.0" oninput="setStrumVolume(this.value)">
+          <div class="vu-meter-ladder" id="strumVuLadder" title="Guitar Strum VU Peak">
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+            <div class="vu-led-seg"></div>
+          </div>
         </div>
 
         <span style="color: var(--text-muted); font-size: 0.82rem;" id="bgTrackStatus">Ready · Strum in the air to drive the music!</span>
@@ -1231,6 +1486,26 @@
           <span class="chord-pad-keynum">9</span>
         </button>
       </div>
+
+      <!-- PRESET PROGRESSION QUICK CHIPS -->
+      <div class="progression-chips-wrap">
+        <span class="prog-chip-label">⚡ Progressions:</span>
+        <button class="prog-chip active" id="chip-pani" onclick="applyProgression('pani', ['Em', 'D', 'C', 'D'], this)">
+          <span>Pani Da Rang:</span> <strong>Em → D → C → D</strong>
+        </button>
+        <button class="prog-chip" id="chip-mitti" onclick="applyProgression('mitti', ['G', 'Em', 'C', 'D'], this)">
+          <span>Mitti Di Khushboo:</span> <strong>G → Em → C → D</strong>
+        </button>
+        <button class="prog-chip" id="chip-nazm" onclick="applyProgression('nazm', ['C', 'G', 'Am', 'F'], this)">
+          <span>Nazm Nazm:</span> <strong>C → G → Am → F</strong>
+        </button>
+        <button class="prog-chip" id="chip-pop4" onclick="applyProgression('pop4', ['C', 'G', 'Am', 'F'], this)">
+          <span>Classic Pop:</span> <strong>C → G → Am → F</strong>
+        </button>
+        <button class="prog-chip" id="chip-rock" onclick="applyProgression('rock', ['Em', 'G', 'D', 'A'], this)">
+          <span>Acoustic Rock:</span> <strong>Em → G → D → A</strong>
+        </button>
+      </div>
     </div>
 
     <!-- Quick Guide -->
@@ -1302,6 +1577,11 @@
     var isMuted = false;
     var stringVibrations = [0, 0, 0, 0, 0, 0];
 
+    var strumSparks = [];
+    var trackedStrumX = null;
+    var trackedStrumY = null;
+    var activeProgressionChords = ['Em', 'D', 'C', 'D'];
+
     var isWebcamRunning = false;
     var isMouseDemo = false;
     var isProcessing = false;
@@ -1346,12 +1626,14 @@
     }
 
     function toggleCameraMirror() {
+      if (guitarAudio) guitarAudio.playUiClick(1200);
       isCameraMirrored = !isCameraMirrored;
       const btn = document.getElementById('mirrorBtnText');
       if (btn) btn.textContent = isCameraMirrored ? "Mirror On" : "Mirror Off";
     }
 
     function toggleFullscreenStage() {
+      if (guitarAudio) guitarAudio.playUiClick(1300);
       const stage = document.getElementById('stageWrapper') || document.querySelector('.stage-wrapper');
       if (!document.fullscreenElement) {
         if (stage && stage.requestFullscreen) {
@@ -1363,6 +1645,7 @@
     }
 
     function toggleMuteAudio() {
+      if (guitarAudio) guitarAudio.playUiClick(1000);
       isMuted = !isMuted;
       if (guitarAudio && guitarAudio.masterGain && guitarAudio.ctx) {
         guitarAudio.masterGain.gain.setValueAtTime(isMuted ? 0 : 0.95, guitarAudio.ctx.currentTime);
@@ -1375,11 +1658,13 @@
     }
 
     function openShortcutsModal() {
+      if (guitarAudio) guitarAudio.playUiClick(1400);
       if (!shortcutsModal) shortcutsModal = document.getElementById('shortcutsModal');
       if (shortcutsModal) shortcutsModal.classList.add('open');
     }
 
     function closeShortcutsModal(e) {
+      if (guitarAudio) guitarAudio.playUiClick(900);
       if (!shortcutsModal) shortcutsModal = document.getElementById('shortcutsModal');
       if (shortcutsModal) shortcutsModal.classList.remove('open');
     }
@@ -1488,6 +1773,25 @@
           }
         });
       }
+
+      playUiClick(freq = 1400) {
+        try {
+          if (!this.ctx) this.init();
+          if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(320, this.ctx.currentTime + 0.025);
+          g.gain.setValueAtTime(0.06, this.ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.028);
+          osc.connect(g);
+          g.connect(this.masterGain || this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.03);
+        } catch (e) {}
+      }
     }
 
     /* ==========================================================================
@@ -1534,6 +1838,39 @@
 
         this.currentTrackKey = 'pani_da_rang';
         this.audioEl.src = this.trackFiles['pani_da_rang'].file;
+        this.setupTimeEvents();
+      }
+
+      setupTimeEvents() {
+        this.audioEl.addEventListener('timeupdate', () => this.updateTimeline());
+        this.audioEl.addEventListener('loadedmetadata', () => this.updateTimeline());
+      }
+
+      updateTimeline() {
+        const cur = this.audioEl.currentTime || 0;
+        const dur = this.audioEl.duration || 0;
+        const fill = document.getElementById('songTimelineFill');
+        const readout = document.getElementById('songTimeReadout');
+
+        if (dur > 0 && fill) {
+          const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
+          fill.style.width = pct + '%';
+        }
+
+        if (readout) {
+          const curMin = Math.floor(cur / 60);
+          const curSec = Math.floor(cur % 60).toString().padStart(2, '0');
+          const durMin = isNaN(dur) || dur === 0 ? 0 : Math.floor(dur / 60);
+          const durSec = isNaN(dur) || dur === 0 ? '00' : Math.floor(dur % 60).toString().padStart(2, '0');
+          readout.textContent = `${curMin}:${curSec} / ${durMin}:${durSec}`;
+        }
+      }
+
+      seekToPercent(pct) {
+        if (this.audioEl && this.audioEl.duration) {
+          this.audioEl.currentTime = this.audioEl.duration * pct;
+          this.updateTimeline();
+        }
       }
 
       setTrack(key) {
@@ -1543,6 +1880,8 @@
           this.audioEl.src = track.file;
           const lyricsEl = document.getElementById('hudLyrics');
           if (lyricsEl) lyricsEl.textContent = track.lyrics;
+          const vinylTitle = document.getElementById('vinylTrackTitle');
+          if (vinylTitle) vinylTitle.textContent = track.title;
           if (typeof selectChord === 'function') {
             selectChord(track.defaultChord);
           }
@@ -1559,11 +1898,21 @@
         this.audioEl.volume = vol;
         this.audioEl.play().catch(e => console.warn("Audio play prevented:", e));
         this.isPlaying = true;
+
+        const vinylDisc = document.getElementById('vinylDisc');
+        if (vinylDisc) vinylDisc.classList.add('spinning');
+        const vinylStatus = document.getElementById('vinylTrackStatus');
+        if (vinylStatus) vinylStatus.textContent = "NOW PLAYING";
       }
 
       pause() {
         this.audioEl.pause();
         this.isPlaying = false;
+
+        const vinylDisc = document.getElementById('vinylDisc');
+        if (vinylDisc) vinylDisc.classList.remove('spinning');
+        const vinylStatus = document.getElementById('vinylTrackStatus');
+        if (vinylStatus) vinylStatus.textContent = "PAUSED";
       }
     }
 
@@ -1957,6 +2306,7 @@
 
     function startMouseDemo() {
       guitarAudio.init();
+      if (guitarAudio) guitarAudio.playUiClick(1500);
       startOverlay.classList.add('hidden');
       isMouseDemo = true;
       trackingDot.classList.add('live');
@@ -1973,11 +2323,26 @@
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-    // Mouse drag strum fallback
+    // Mouse drag strum fallback & interactive cursor HUD tracking
     let mouseStartY = null;
     canvas.addEventListener('mousedown', (e) => {
       guitarAudio.init();
       mouseStartY = e.clientY;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (isMouseDemo) {
+        const rect = canvas.getBoundingClientRect();
+        trackedStrumX = (e.clientX - rect.left);
+        trackedStrumY = (e.clientY - rect.top);
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      if (isMouseDemo) {
+        trackedStrumX = null;
+        trackedStrumY = null;
+      }
     });
 
     window.addEventListener('mouseup', (e) => {
@@ -2010,6 +2375,54 @@
       }
       ctx.restore();
 
+      // 1. Sci-Fi Viewfinder Corner Brackets & Crosshair HUD
+      ctx.save();
+      const cornerLen = 22;
+      const pad = 16;
+      ctx.strokeStyle = "rgba(245, 158, 11, 0.45)";
+      ctx.lineWidth = 2;
+
+      // Top-Left ⌜
+      ctx.beginPath();
+      ctx.moveTo(pad, pad + cornerLen);
+      ctx.lineTo(pad, pad);
+      ctx.lineTo(pad + cornerLen, pad);
+      ctx.stroke();
+
+      // Top-Right ⌝
+      ctx.beginPath();
+      ctx.moveTo(w - pad - cornerLen, pad);
+      ctx.lineTo(w - pad, pad);
+      ctx.lineTo(w - pad, pad + cornerLen);
+      ctx.stroke();
+
+      // Bottom-Left ⌞
+      ctx.beginPath();
+      ctx.moveTo(pad, h - pad - cornerLen);
+      ctx.lineTo(pad, h - pad);
+      ctx.lineTo(pad + cornerLen, h - pad);
+      ctx.stroke();
+
+      // Bottom-Right ⌟
+      ctx.beginPath();
+      ctx.moveTo(w - pad - cornerLen, h - pad);
+      ctx.lineTo(w - pad, h - pad);
+      ctx.lineTo(w - pad, h - pad - cornerLen);
+      ctx.stroke();
+
+      // Subtle Center Reticle (+)
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.16)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx - 14, cy); ctx.lineTo(cx - 4, cy);
+      ctx.moveTo(cx + 4, cy);  ctx.lineTo(cx + 14, cy);
+      ctx.moveTo(cx, cy - 14); ctx.lineTo(cx, cy - 4);
+      ctx.moveTo(cx, cy + 4);  ctx.lineTo(cx, cy + 14);
+      ctx.stroke();
+      ctx.restore();
+
       // Subtle non-intrusive Air Strum Zone watermark (high-tech aesthetic)
       ctx.save();
       ctx.strokeStyle = "rgba(245, 158, 11, 0.16)";
@@ -2023,6 +2436,47 @@
       ctx.textAlign = "center";
       ctx.fillText("AIR STRUM ZONE ↕", w * 0.28, h * 0.28);
       ctx.restore();
+
+      // 2. Dynamic Hand-Tracking Reticle Lock HUD
+      if (trackedStrumX !== null && trackedStrumY !== null) {
+        ctx.save();
+        const reticleTime = performance.now() * 0.003;
+        ctx.translate(trackedStrumX, trackedStrumY);
+
+        // Outer rotating dashed targeting ring
+        ctx.save();
+        ctx.rotate(reticleTime);
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.65)";
+        ctx.lineWidth = 1.6;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.arc(0, 0, 24, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // Inner solid ring with cross tick marks
+        ctx.strokeStyle = "rgba(254, 240, 138, 0.85)";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(0, 0, 14, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // HUD Lock Tag
+        ctx.fillStyle = "rgba(15, 20, 34, 0.8)";
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.6)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(18, -12, 112, 20, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#f59e0b";
+        ctx.font = "bold 9.5px -apple-system, monospace";
+        ctx.textAlign = "left";
+        ctx.fillText("🎸 STRUM TRACKER [LOCKED]", 24, 2);
+
+        ctx.restore();
+      }
 
       if (isWebcamRunning && handsDetector && !isProcessing && webcamElement && webcamElement.readyState >= 2) {
         isProcessing = true;
@@ -2048,6 +2502,31 @@
         ctx.beginPath();
         ctx.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.restore();
+      }
+
+      // 3. Acoustic Strum Sparks (Particle Physics)
+      for (let s = strumSparks.length - 1; s >= 0; s--) {
+        const p = strumSparks[s];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.16; // gravity
+        p.vx *= 0.98; // drag
+        p.life -= p.decay;
+
+        if (p.life <= 0) {
+          strumSparks.splice(s, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(1, p.size * p.life), 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       }
 
@@ -2083,6 +2562,9 @@
           visCtx.fillRect(bx, by, barWidth, barH);
         }
       }
+
+      // 4. Update Live Analog LED VU Peak Meters
+      updateVuMeters();
 
       // Fretboard string vibration continuous rendering
       if (stringVibrations.some(v => v > 0.01)) {
@@ -2133,8 +2615,13 @@
           if (wrist.x < w * 0.55) {
             strumHandX = (points[8].x + points[4].x) * 0.5;
             strumHandY = (points[8].y + points[4].y) * 0.5;
+            trackedStrumX = strumHandX;
+            trackedStrumY = strumHandY;
           }
         });
+      } else {
+        trackedStrumX = null;
+        trackedStrumY = null;
       }
 
       if (strumHandY !== null) {
@@ -2178,6 +2665,23 @@
         downstroke
       });
 
+      // Burst Acoustic Strum Sparks
+      const sparkCount = 20;
+      for (let s = 0; s < sparkCount; s++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 5.5 + 2.0;
+        strumSparks.push({
+          x: x || 250,
+          y: y || 250,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd + (downstroke ? 1.6 : -1.6),
+          life: 1.0,
+          decay: Math.random() * 0.035 + 0.02,
+          size: Math.random() * 3.5 + 2,
+          color: Math.random() > 0.35 ? "#f59e0b" : "#fef08a"
+        });
+      }
+
       totalStrums++;
       if (hudTotalStrums) hudTotalStrums.textContent = totalStrums;
       if (hudActingStatus) hudActingStatus.textContent = downstroke ? "⬇️ DOWNSTROKE" : "⬆️ UPSTROKE";
@@ -2206,11 +2710,14 @@
           if (bgTrackStatus) bgTrackStatus.textContent = "🔥 Vocals and guitar playing in sync with your strumming!";
         }
 
-        // Advance song chords along the progression
-        const track = songPlayer.trackFiles[songPlayer.currentTrackKey];
-        if (track && track.progression && track.progression.length > 1) {
-          songProgressionIndex = (songProgressionIndex + 1) % track.progression.length;
-          selectChord(track.progression[songProgressionIndex], false);
+        // Advance song chords along the active progression
+        const progressionList = (activeProgressionChords && activeProgressionChords.length > 0)
+          ? activeProgressionChords
+          : (songPlayer.trackFiles[songPlayer.currentTrackKey]?.progression || ['Em', 'D', 'C', 'D']);
+
+        if (progressionList && progressionList.length > 1) {
+          songProgressionIndex = (songProgressionIndex + 1) % progressionList.length;
+          selectChord(progressionList[songProgressionIndex], false);
         }
 
         // Pause if no strumming for 2 seconds
@@ -2226,7 +2733,62 @@
       }
     }
 
+    function updateVuMeters() {
+      const now = performance.now();
+      const isSongOn = songPlayer && songPlayer.isPlaying;
+      const strumEnergy = Math.max(0, 1 - (now - lastStrumTime) / 800);
+      
+      const bgVol = bgVolumeSlider ? parseFloat(bgVolumeSlider.value) : 0.8;
+      const bgEnergy = isSongOn ? (bgVol * (0.35 + 0.65 * Math.abs(Math.sin(now * 0.007)))) : 0;
+      
+      const bgSegments = Math.round(bgEnergy * 8);
+      const strumSegments = Math.round(strumEnergy * 8);
+
+      const bgLeds = document.querySelectorAll('#bgVuLadder .vu-led-seg');
+      bgLeds.forEach((led, i) => {
+        led.className = 'vu-led-seg';
+        if (i < bgSegments) {
+          if (i < 5) led.classList.add('lit-green');
+          else if (i < 7) led.classList.add('lit-yellow');
+          else led.classList.add('lit-red');
+        }
+      });
+
+      const strumLeds = document.querySelectorAll('#strumVuLadder .vu-led-seg');
+      strumLeds.forEach((led, i) => {
+        led.className = 'vu-led-seg';
+        if (i < strumSegments) {
+          if (i < 5) led.classList.add('lit-green');
+          else if (i < 7) led.classList.add('lit-yellow');
+          else led.classList.add('lit-red');
+        }
+      });
+    }
+
+    function applyProgression(id, chords, btnEl) {
+      if (guitarAudio) guitarAudio.playUiClick(1500);
+      activeProgressionChords = chords;
+      songProgressionIndex = 0;
+      document.querySelectorAll('.prog-chip').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      selectChord(chords[0], true);
+      if (bgTrackStatus) {
+        bgTrackStatus.textContent = `Progression active: ${chords.join(' → ')}`;
+      }
+    }
+
+    function onTimelineClick(e) {
+      if (guitarAudio) guitarAudio.playUiClick(1100);
+      const bar = document.getElementById('songTimelineBar');
+      if (!bar || !songPlayer) return;
+      const rect = bar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.min(1, Math.max(0, clickX / rect.width));
+      songPlayer.seekToPercent(pct);
+    }
+
     function selectChord(chordKey, resetIndex = true) {
+      if (guitarAudio && resetIndex) guitarAudio.playUiClick(1200);
       activeChordKey = chordKey;
       const chord = CHORD_LIBRARY[chordKey] || CHORD_LIBRARY['Em'];
 
@@ -2274,7 +2836,10 @@
 
     /* Background Song Controls */
     function togglePlayBgSong() {
-      if (guitarAudio) guitarAudio.init();
+      if (guitarAudio) {
+        guitarAudio.init();
+        guitarAudio.playUiClick(1400);
+      }
       if (songPlayer.isPlaying) {
         songPlayer.pause();
         if (btnPlayBg) btnPlayBg.textContent = "▶️ Play Song";
@@ -2287,6 +2852,7 @@
     }
 
     function changeTrack(key) {
+      if (guitarAudio) guitarAudio.playUiClick(1500);
       songPlayer.setTrack(key);
       songProgressionIndex = 0;
       if (songPlayer.isPlaying) {
@@ -2318,12 +2884,22 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      if (guitarAudio) guitarAudio.init();
+      if (guitarAudio) {
+        guitarAudio.init();
+        guitarAudio.playUiClick(1600);
+      }
       const url = URL.createObjectURL(file);
       songPlayer.audioEl.src = url;
       songPlayer.audioEl.play();
       songPlayer.isPlaying = true;
       if (btnPlayBg) btnPlayBg.textContent = "⏸️ Pause Song";
+
+      const vinylDisc = document.getElementById('vinylDisc');
+      if (vinylDisc) vinylDisc.classList.add('spinning');
+      const vinylTitle = document.getElementById('vinylTrackTitle');
+      if (vinylTitle) vinylTitle.textContent = file.name;
+      const vinylStatus = document.getElementById('vinylTrackStatus');
+      if (vinylStatus) vinylStatus.textContent = "NOW PLAYING";
 
       const lyricsEl = document.getElementById('hudLyrics');
       if (lyricsEl) lyricsEl.textContent = `"${file.name}"`;
@@ -2352,12 +2928,18 @@
       }
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
+    function initImmediateSetup() {
       initDomReferences();
       resizeFretboardCanvas();
       if (songPlayer) songPlayer.setTrack('pani_da_rang');
-      selectChord('Em');
-    });
+      selectChord('Em', false);
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initImmediateSetup);
+    } else {
+      initImmediateSetup();
+    }
   </script>
 </body>
 </html>

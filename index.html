@@ -1770,6 +1770,10 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
           <span id="muteBtnText">Sound On</span>
         </button>
+        <button class="stage-pill-btn" id="antigravityToggleBtn" onclick="toggleAntigravityField()" title="Toggle React Bits 3D Antigravity Particle Field">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line></svg>
+          <span id="antigravityBtnText">Antigravity: On</span>
+        </button>
         <button class="stage-pill-btn" onclick="toggleFullscreenStage()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
           Fullscreen
@@ -2104,6 +2108,120 @@
     /* ==========================================================================
        REACT BITS: OPTION WHEEL ENGINE
        ========================================================================== */
+    /* ==========================================================================
+       REACT BITS: ANTIGRAVITY PARTICLE FIELD ENGINE
+       ========================================================================== */
+    var isAntigravityEnabled = true;
+    var antigravityParticles = [];
+    var antigravityVirtualMouse = { x: 300, y: 200 };
+    var antigravityLastMousePos = { x: 0, y: 0 };
+    var antigravityLastMoveTime = 0;
+
+    function initAntigravityField(w, h) {
+      antigravityParticles = [];
+      const count = 260;
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        antigravityParticles.push({
+          t: Math.random() * 100,
+          speed: 0.015 + Math.random() * 0.025,
+          mx: x,
+          my: y,
+          cx: x,
+          cy: y,
+          cz: (Math.random() - 0.5) * 30,
+          randomRadiusOffset: (Math.random() - 0.5) * 12
+        });
+      }
+    }
+
+    function toggleAntigravityField() {
+      if (guitarAudio && guitarAudio.playUiClick) guitarAudio.playUiClick(1500);
+      isAntigravityEnabled = !isAntigravityEnabled;
+      const btnText = document.getElementById('antigravityBtnText');
+      if (btnText) {
+        btnText.textContent = isAntigravityEnabled ? 'Antigravity: On' : 'Antigravity: Off';
+      }
+    }
+
+    function renderAntigravityParticles(ctx, w, h, timeNow) {
+      if (!isAntigravityEnabled) return;
+      if (antigravityParticles.length === 0) {
+        initAntigravityField(w, h);
+      }
+
+      // Determine target attractor
+      let destX = w * 0.5;
+      let destY = h * 0.5;
+
+      if (trackedStrumX !== null && trackedStrumY !== null) {
+        destX = trackedStrumX;
+        destY = trackedStrumY;
+        antigravityLastMoveTime = timeNow;
+      } else if (timeNow - antigravityLastMoveTime > 1500) {
+        // Auto-animate wave motion
+        const tSec = timeNow * 0.001;
+        destX = w * 0.5 + Math.sin(tSec * 0.6) * (w * 0.22);
+        destY = h * 0.5 + Math.cos(tSec * 1.2) * (h * 0.18);
+      }
+
+      const smoothFactor = 0.06;
+      antigravityVirtualMouse.x += (destX - antigravityVirtualMouse.x) * smoothFactor;
+      antigravityVirtualMouse.y += (destY - antigravityVirtualMouse.y) * smoothFactor;
+
+      const targetX = antigravityVirtualMouse.x;
+      const targetY = antigravityVirtualMouse.y;
+
+      const magnetRadius = 160;
+      const ringRadius = 70;
+      const waveSpeed = 0.04;
+      const waveAmplitude = 12;
+      const particleSize = 2.2;
+      const lerpSpeed = 0.09;
+      const globalRotation = timeNow * 0.0008;
+
+      ctx.save();
+      for (let i = 0; i < antigravityParticles.length; i++) {
+        const p = antigravityParticles[i];
+        p.t += p.speed;
+
+        const dx = p.mx - targetX;
+        const dy = p.my - targetY;
+        const dist = Math.hypot(dx, dy);
+
+        let targetPosX = p.mx + Math.sin(p.t) * 6;
+        let targetPosY = p.my + Math.cos(p.t * 0.8) * 6;
+
+        if (dist < magnetRadius) {
+          const angle = Math.atan2(dy, dx) + globalRotation;
+          const wave = Math.sin(p.t * 2 + angle * 3) * (0.5 * waveAmplitude);
+          const deviation = p.randomRadiusOffset * 0.5;
+          const currentRingRadius = ringRadius + wave + deviation;
+
+          targetPosX = targetX + currentRingRadius * Math.cos(angle);
+          targetPosY = targetY + currentRingRadius * Math.sin(angle);
+        }
+
+        p.cx += (targetPosX - p.cx) * lerpSpeed;
+        p.cy += (targetPosY - p.cy) * lerpSpeed;
+
+        const currentDist = Math.hypot(p.cx - targetX, p.cy - targetY);
+        const distFromRing = Math.abs(currentDist - ringRadius);
+        let scaleFactor = Math.max(0.15, Math.min(1, 1 - distFromRing / 45));
+        const pulse = 0.8 + Math.sin(p.t * 3) * 0.2;
+        const rad = Math.max(1, particleSize * scaleFactor * pulse);
+
+        // Warm acoustic amber particle rendering with capsule orientation
+        const inRing = dist < magnetRadius;
+        ctx.fillStyle = inRing ? "#f59e0b" : "rgba(217, 119, 6, 0.4)";
+        ctx.beginPath();
+        ctx.arc(p.cx, p.cy, rad, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
     /* ==========================================================================
        REACT BITS: BUBBLE MENU CONTROLLER
        ========================================================================== */
@@ -3243,6 +3361,9 @@
         ctx.fillRect(0, 0, w, h);
       }
       ctx.restore();
+
+      // React Bits Antigravity 3D Particle Field
+      renderAntigravityParticles(ctx, w, h, performance.now());
 
       // Clean Minimalist Hand Presence Indicator
       if (trackedStrumX !== null && trackedStrumY !== null) {
